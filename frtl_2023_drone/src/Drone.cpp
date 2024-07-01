@@ -514,7 +514,7 @@ void Drone::setOffboardControlMode(DronePX4::CONTROLLER_TYPE type) {
 	msg.acceleration = false;
 	msg.attitude = false;
 	msg.body_rate = false;
-	msg.actuator = false;
+	msg.direct_actuator = false;
 
 	if (type == DronePX4::CONTROLLER_TYPE::POSITION) {
 		msg.position = true;
