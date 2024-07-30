@@ -1,0 +1,147 @@
+[0.000000] (-) TimerEvent: {}
+[0.000292] (frtl_2024_demo) JobQueued: {'identifier': 'frtl_2024_demo', 'dependencies': OrderedDict()}
+[0.001064] (frtl_2024_demo) JobStarted: {'identifier': 'frtl_2024_demo'}
+[0.019774] (frtl_2024_demo) JobProgress: {'identifier': 'frtl_2024_demo', 'progress': 'cmake'}
+[0.020506] (frtl_2024_demo) JobProgress: {'identifier': 'frtl_2024_demo', 'progress': 'build'}
+[0.021652] (frtl_2024_demo) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo', '--', '-j8', '-l8'], 'cwd': '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('GZ_SIM_RESOURCE_PATH', '/home/vinicius/PX4-Autopilot/Tools/simulation/gz'), ('LANGUAGE', 'en_US:en'), ('USER', 'vinicius'), ('LC_TIME', 'pt_BR.UTF-8'), ('GIO_MODULE_DIR', '/home/vinicius/snap/code/common/.cache/gio-modules'), ('XDG_SESSION_TYPE', 'x11'), ('GIT_ASKPASS', '/snap/code/164/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('GTK_EXE_PREFIX_VSCODE_SNAP_ORIG', ''), ('GDK_BACKEND_VSCODE_SNAP_ORIG', ''), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch/lib:/home/vinicius/frtl_2024_ws/install/px4_ros_com/lib:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone/lib:/home/vinicius/frtl_2024_ws/install/px4_msgs/lib:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils/lib:/home/vinicius/frtl_2024_ws/install/fsm/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/vinicius'), ('CHROME_DESKTOP', 'code-url-handler.desktop'), ('CONDA_SHLVL', '0'), ('LOCPATH_VSCODE_SNAP_ORIG', ''), ('OLDPWD', '/home/vinicius/frtl_2024_ws/src/frtl_2024'), ('TERM_PROGRAM_VERSION', '1.91.1'), ('DESKTOP_SESSION', 'ubuntu'), ('GTK_PATH', '/snap/code/164/usr/lib/x86_64-linux-gnu/gtk-3.0'), ('GTK_IM_MODULE_FILE', '/home/vinicius/snap/code/common/.cache/immodules/immodules.cache'), ('GIO_LAUNCHED_DESKTOP_FILE', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('GSETTINGS_SCHEMA_DIR_VSCODE_SNAP_ORIG', ''), ('VSCODE_GIT_ASKPASS_MAIN', '/snap/code/164/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'pt_BR.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/snap/code/164/usr/share/code/code'), ('MANAGERPID', '2196'), ('LC_CTYPE', 'pt_BR.UTF-8'), ('SYSTEMD_EXEC_PID', '2561'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('_CE_M', ''), ('LIBVIRT_DEFAULT_URI', 'qemu:///system'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '6245'), ('COLCON_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'vinicius'), ('JOURNAL_STREAM', '8:40308'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_SESSION_CLASS', 'user'), ('XDG_DATA_DIRS_VSCODE_SNAP_ORIG', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('USERNAME', 'vinicius'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('_CE_CONDA', ''), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/bin:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/etc/init.d:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/etc/init.d-posix:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch:/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:/home/vinicius/.local/bin:/opt/ros/humble/bin:/home/vinicius/anaconda3/condabin:/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:/home/vinicius/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/vinicius-Nitro-AN515-43:@/tmp/.ICE-unix/2533,unix/vinicius-Nitro-AN515-43:/tmp/.ICE-unix/2533'), ('GTK_EXE_PREFIX', '/snap/code/164/usr'), ('INVOCATION_ID', '0c400422e93746459a079f942b314728'), ('PAPERSIZE', 'a4'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'pt_BR.UTF-8'), ('BAMF_DESKTOP_FILE_HINT', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':1'), ('LOCPATH', '/snap/code/164/usr/lib/locale'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'pt_BR.UTF-8'), ('GIO_MODULE_DIR_VSCODE_SNAP_ORIG', ''), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-3b36d8fec7.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('GSETTINGS_SCHEMA_DIR', '/home/vinicius/snap/code/164/.local/share/glib-2.0/schemas'), ('AMENT_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch:/home/vinicius/frtl_2024_ws/install/simulation_worlds:/home/vinicius/frtl_2024_ws/install/simulation_python_helpers:/home/vinicius/frtl_2024_ws/install/simulation_models:/home/vinicius/frtl_2024_ws/install/px4_ros_com:/home/vinicius/frtl_2024_ws/install/frtl_2024_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase4:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase3:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase2:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase1:/home/vinicius/frtl_2024_ws/install/frtl_2023_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone:/home/vinicius/frtl_2024_ws/install/px4_msgs:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils:/home/vinicius/frtl_2024_ws/install/fsm_demo:/home/vinicius/frtl_2024_ws/install/fsm:/opt/ros/humble'), ('CONDA_PYTHON_EXE', '/home/vinicius/anaconda3/bin/python'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'pt_BR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GTK_PATH_VSCODE_SNAP_ORIG', ''), ('GTK_IM_MODULE_FILE_VSCODE_SNAP_ORIG', ''), ('LC_MEASUREMENT', 'pt_BR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'pt_BR.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('CONDA_EXE', '/home/vinicius/anaconda3/bin/conda'), ('XDG_DATA_DIRS', '/home/vinicius/snap/code/164/.local/share:/home/vinicius/snap/code/164:/snap/code/164/usr/share:/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/vinicius/frtl_2024_ws/install/simulation_python_helpers/lib/python3.10/site-packages:/home/vinicius/frtl_2024_ws/install/px4_ros_com/local/lib/python3.10/dist-packages:/home/vinicius/frtl_2024_ws/install/px4_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'pt_BR.UTF-8'), ('LC_PAPER', 'pt_BR.UTF-8'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch:/home/vinicius/frtl_2024_ws/install/simulation_worlds:/home/vinicius/frtl_2024_ws/install/simulation_models:/home/vinicius/frtl_2024_ws/install/px4_ros_com:/home/vinicius/frtl_2024_ws/install/frtl_2024_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase4:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase3:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase2:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase1:/home/vinicius/frtl_2024_ws/install/frtl_2023_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone:/home/vinicius/frtl_2024_ws/install/px4_msgs:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils:/home/vinicius/frtl_2024_ws/install/nlohmann_json:/home/vinicius/frtl_2024_ws/install/fsm_demo:/home/vinicius/frtl_2024_ws/install/fsm:/home/vinicius/frtl_2024_ws/install/simulation_python_helpers:/opt/ros/humble')]), 'shell': False}
+[0.099656] (-) TimerEvent: {}
+[0.106676] (frtl_2024_demo) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target circle\x1b[0m\n'}
+[0.108099] (frtl_2024_demo) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target takeoff_and_land\x1b[0m\n'}
+[0.152402] (frtl_2024_demo) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/circle.dir/src/examples/circle.cpp.o\x1b[0m\n'}
+[0.157012] (frtl_2024_demo) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/takeoff_and_land.dir/src/examples/takeoff_and_land.cpp.o\x1b[0m\n'}
+[0.199757] (-) TimerEvent: {}
+[0.300094] (-) TimerEvent: {}
+[0.400548] (-) TimerEvent: {}
+[0.500960] (-) TimerEvent: {}
+[0.601415] (-) TimerEvent: {}
+[0.701983] (-) TimerEvent: {}
+[0.802313] (-) TimerEvent: {}
+[0.902696] (-) TimerEvent: {}
+[1.003063] (-) TimerEvent: {}
+[1.103387] (-) TimerEvent: {}
+[1.203701] (-) TimerEvent: {}
+[1.304047] (-) TimerEvent: {}
+[1.404435] (-) TimerEvent: {}
+[1.504756] (-) TimerEvent: {}
+[1.605116] (-) TimerEvent: {}
+[1.705442] (-) TimerEvent: {}
+[1.805778] (-) TimerEvent: {}
+[1.906135] (-) TimerEvent: {}
+[2.006553] (-) TimerEvent: {}
+[2.107576] (-) TimerEvent: {}
+[2.207990] (-) TimerEvent: {}
+[2.308330] (-) TimerEvent: {}
+[2.408674] (-) TimerEvent: {}
+[2.509123] (-) TimerEvent: {}
+[2.609512] (-) TimerEvent: {}
+[2.709968] (-) TimerEvent: {}
+[2.810444] (-) TimerEvent: {}
+[2.910953] (-) TimerEvent: {}
+[3.011284] (-) TimerEvent: {}
+[3.111615] (-) TimerEvent: {}
+[3.211980] (-) TimerEvent: {}
+[3.312362] (-) TimerEvent: {}
+[3.412811] (-) TimerEvent: {}
+[3.513142] (-) TimerEvent: {}
+[3.613493] (-) TimerEvent: {}
+[3.713953] (-) TimerEvent: {}
+[3.814522] (-) TimerEvent: {}
+[3.915052] (-) TimerEvent: {}
+[4.015454] (-) TimerEvent: {}
+[4.115783] (-) TimerEvent: {}
+[4.216237] (-) TimerEvent: {}
+[4.316604] (-) TimerEvent: {}
+[4.417026] (-) TimerEvent: {}
+[4.517850] (-) TimerEvent: {}
+[4.618237] (-) TimerEvent: {}
+[4.718706] (-) TimerEvent: {}
+[4.820612] (-) TimerEvent: {}
+[4.921012] (-) TimerEvent: {}
+[5.021406] (-) TimerEvent: {}
+[5.121886] (-) TimerEvent: {}
+[5.222266] (-) TimerEvent: {}
+[5.322665] (-) TimerEvent: {}
+[5.423163] (-) TimerEvent: {}
+[5.523859] (-) TimerEvent: {}
+[5.624339] (-) TimerEvent: {}
+[5.724859] (-) TimerEvent: {}
+[5.825375] (-) TimerEvent: {}
+[5.925751] (-) TimerEvent: {}
+[6.026090] (-) TimerEvent: {}
+[6.126559] (-) TimerEvent: {}
+[6.227192] (-) TimerEvent: {}
+[6.327577] (-) TimerEvent: {}
+[6.428012] (-) TimerEvent: {}
+[6.528462] (-) TimerEvent: {}
+[6.628873] (-) TimerEvent: {}
+[6.729308] (-) TimerEvent: {}
+[6.829944] (-) TimerEvent: {}
+[6.930422] (-) TimerEvent: {}
+[7.030925] (-) TimerEvent: {}
+[7.131254] (-) TimerEvent: {}
+[7.231643] (-) TimerEvent: {}
+[7.331987] (-) TimerEvent: {}
+[7.432853] (-) TimerEvent: {}
+[7.533258] (-) TimerEvent: {}
+[7.634244] (-) TimerEvent: {}
+[7.734639] (-) TimerEvent: {}
+[7.834957] (-) TimerEvent: {}
+[7.935302] (-) TimerEvent: {}
+[8.035670] (-) TimerEvent: {}
+[8.136088] (-) TimerEvent: {}
+[8.236455] (-) TimerEvent: {}
+[8.336819] (-) TimerEvent: {}
+[8.437204] (-) TimerEvent: {}
+[8.537527] (-) TimerEvent: {}
+[8.577352] (frtl_2024_demo) StdoutLine: {'line': b'[ 75%] \x1b[32m\x1b[1mLinking CXX executable takeoff_and_land\x1b[0m\n'}
+[8.637638] (-) TimerEvent: {}
+[8.738013] (-) TimerEvent: {}
+[8.826445] (frtl_2024_demo) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable circle\x1b[0m\n'}
+[8.838132] (-) TimerEvent: {}
+[8.938527] (-) TimerEvent: {}
+[9.038914] (-) TimerEvent: {}
+[9.139353] (-) TimerEvent: {}
+[9.239779] (-) TimerEvent: {}
+[9.340206] (-) TimerEvent: {}
+[9.440611] (-) TimerEvent: {}
+[9.541028] (-) TimerEvent: {}
+[9.641432] (-) TimerEvent: {}
+[9.741867] (-) TimerEvent: {}
+[9.842230] (-) TimerEvent: {}
+[9.942553] (-) TimerEvent: {}
+[10.042897] (-) TimerEvent: {}
+[10.143209] (-) TimerEvent: {}
+[10.243531] (-) TimerEvent: {}
+[10.291598] (frtl_2024_demo) StdoutLine: {'line': b'[100%] Built target takeoff_and_land\n'}
+[10.343652] (-) TimerEvent: {}
+[10.443998] (-) TimerEvent: {}
+[10.544322] (-) TimerEvent: {}
+[10.575980] (frtl_2024_demo) StdoutLine: {'line': b'[100%] Built target circle\n'}
+[10.596718] (frtl_2024_demo) CommandEnded: {'returncode': 0}
+[10.644417] (-) TimerEvent: {}
+[10.657128] (frtl_2024_demo) JobProgress: {'identifier': 'frtl_2024_demo', 'progress': 'install'}
+[10.675230] (frtl_2024_demo) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo'], 'cwd': '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('GZ_SIM_RESOURCE_PATH', '/home/vinicius/PX4-Autopilot/Tools/simulation/gz'), ('LANGUAGE', 'en_US:en'), ('USER', 'vinicius'), ('LC_TIME', 'pt_BR.UTF-8'), ('GIO_MODULE_DIR', '/home/vinicius/snap/code/common/.cache/gio-modules'), ('XDG_SESSION_TYPE', 'x11'), ('GIT_ASKPASS', '/snap/code/164/usr/share/code/resources/app/extensions/git/dist/askpass.sh'), ('GTK_EXE_PREFIX_VSCODE_SNAP_ORIG', ''), ('GDK_BACKEND_VSCODE_SNAP_ORIG', ''), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch/lib:/home/vinicius/frtl_2024_ws/install/px4_ros_com/lib:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone/lib:/home/vinicius/frtl_2024_ws/install/px4_msgs/lib:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils/lib:/home/vinicius/frtl_2024_ws/install/fsm/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/vinicius'), ('CHROME_DESKTOP', 'code-url-handler.desktop'), ('CONDA_SHLVL', '0'), ('LOCPATH_VSCODE_SNAP_ORIG', ''), ('OLDPWD', '/home/vinicius/frtl_2024_ws/src/frtl_2024'), ('TERM_PROGRAM_VERSION', '1.91.1'), ('DESKTOP_SESSION', 'ubuntu'), ('GTK_PATH', '/snap/code/164/usr/lib/x86_64-linux-gnu/gtk-3.0'), ('GTK_IM_MODULE_FILE', '/home/vinicius/snap/code/common/.cache/immodules/immodules.cache'), ('GIO_LAUNCHED_DESKTOP_FILE', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('GSETTINGS_SCHEMA_DIR_VSCODE_SNAP_ORIG', ''), ('VSCODE_GIT_ASKPASS_MAIN', '/snap/code/164/usr/share/code/resources/app/extensions/git/dist/askpass-main.js'), ('LC_MONETARY', 'pt_BR.UTF-8'), ('VSCODE_GIT_ASKPASS_NODE', '/snap/code/164/usr/share/code/code'), ('MANAGERPID', '2196'), ('LC_CTYPE', 'pt_BR.UTF-8'), ('SYSTEMD_EXEC_PID', '2561'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('_CE_M', ''), ('LIBVIRT_DEFAULT_URI', 'qemu:///system'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '6245'), ('COLCON_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'vinicius'), ('JOURNAL_STREAM', '8:40308'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_CONFIG_DIRS_VSCODE_SNAP_ORIG', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_SESSION_CLASS', 'user'), ('XDG_DATA_DIRS_VSCODE_SNAP_ORIG', '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('USERNAME', 'vinicius'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('_CE_CONDA', ''), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/bin:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/etc/init.d:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch/etc/init.d-posix:/home/vinicius/frtl_2024_ws/install/simulation_launch/share/simulation_launch:/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:/home/vinicius/.local/bin:/opt/ros/humble/bin:/home/vinicius/anaconda3/condabin:/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:/home/vinicius/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/vinicius-Nitro-AN515-43:@/tmp/.ICE-unix/2533,unix/vinicius-Nitro-AN515-43:/tmp/.ICE-unix/2533'), ('GTK_EXE_PREFIX', '/snap/code/164/usr'), ('INVOCATION_ID', '0c400422e93746459a079f942b314728'), ('PAPERSIZE', 'a4'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'pt_BR.UTF-8'), ('BAMF_DESKTOP_FILE_HINT', '/var/lib/snapd/desktop/applications/code_code.desktop'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'x11'), ('DISPLAY', ':1'), ('LOCPATH', '/snap/code/164/usr/lib/locale'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'Unity'), ('LC_TELEPHONE', 'pt_BR.UTF-8'), ('GIO_MODULE_DIR_VSCODE_SNAP_ORIG', ''), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-3b36d8fec7.sock'), ('TERM_PROGRAM', 'vscode'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('GSETTINGS_SCHEMA_DIR', '/home/vinicius/snap/code/164/.local/share/glib-2.0/schemas'), ('AMENT_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch:/home/vinicius/frtl_2024_ws/install/simulation_worlds:/home/vinicius/frtl_2024_ws/install/simulation_python_helpers:/home/vinicius/frtl_2024_ws/install/simulation_models:/home/vinicius/frtl_2024_ws/install/px4_ros_com:/home/vinicius/frtl_2024_ws/install/frtl_2024_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase4:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase3:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase2:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase1:/home/vinicius/frtl_2024_ws/install/frtl_2023_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone:/home/vinicius/frtl_2024_ws/install/px4_msgs:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils:/home/vinicius/frtl_2024_ws/install/fsm_demo:/home/vinicius/frtl_2024_ws/install/fsm:/opt/ros/humble'), ('CONDA_PYTHON_EXE', '/home/vinicius/anaconda3/bin/python'), ('ORIGINAL_XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('SHELL', '/bin/bash'), ('LC_NAME', 'pt_BR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GTK_PATH_VSCODE_SNAP_ORIG', ''), ('GTK_IM_MODULE_FILE_VSCODE_SNAP_ORIG', ''), ('LC_MEASUREMENT', 'pt_BR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'pt_BR.UTF-8'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/build/frtl_2024_demo'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('CONDA_EXE', '/home/vinicius/anaconda3/bin/conda'), ('XDG_DATA_DIRS', '/home/vinicius/snap/code/164/.local/share:/home/vinicius/snap/code/164:/snap/code/164/usr/share:/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/vinicius/frtl_2024_ws/install/simulation_python_helpers/lib/python3.10/site-packages:/home/vinicius/frtl_2024_ws/install/px4_ros_com/local/lib/python3.10/dist-packages:/home/vinicius/frtl_2024_ws/install/px4_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'pt_BR.UTF-8'), ('LC_PAPER', 'pt_BR.UTF-8'), ('COLCON', '1'), ('CMAKE_PREFIX_PATH', '/home/vinicius/frtl_2024_ws/install/simulation_launch:/home/vinicius/frtl_2024_ws/install/simulation_worlds:/home/vinicius/frtl_2024_ws/install/simulation_models:/home/vinicius/frtl_2024_ws/install/px4_ros_com:/home/vinicius/frtl_2024_ws/install/frtl_2024_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase4:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase3:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase2:/home/vinicius/frtl_2024_ws/install/frtl_2023_fase1:/home/vinicius/frtl_2024_ws/install/frtl_2023_demo:/home/vinicius/frtl_2024_ws/install/frtl_2023_drone:/home/vinicius/frtl_2024_ws/install/px4_msgs:/home/vinicius/frtl_2024_ws/install/frtl_2023_cv_utils:/home/vinicius/frtl_2024_ws/install/nlohmann_json:/home/vinicius/frtl_2024_ws/install/fsm_demo:/home/vinicius/frtl_2024_ws/install/fsm:/home/vinicius/frtl_2024_ws/install/simulation_python_helpers:/opt/ros/humble')]), 'shell': False}
+[10.692253] (frtl_2024_demo) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[10.692643] (frtl_2024_demo) StdoutLine: {'line': b'-- Installing: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/lib/frtl_2024_demo/takeoff_and_land\n'}
+[10.694596] (frtl_2024_demo) StdoutLine: {'line': b'-- Set runtime path of "/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/lib/frtl_2024_demo/takeoff_and_land" to ""\n'}
+[10.694973] (frtl_2024_demo) StdoutLine: {'line': b'-- Installing: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/lib/frtl_2024_demo/circle\n'}
+[10.697052] (frtl_2024_demo) StdoutLine: {'line': b'-- Set runtime path of "/home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/lib/frtl_2024_demo/circle" to ""\n'}
+[10.697447] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/ament_index/resource_index/package_run_dependencies/frtl_2024_demo\n'}
+[10.697654] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/ament_index/resource_index/parent_prefix_path/frtl_2024_demo\n'}
+[10.697878] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/environment/ament_prefix_path.sh\n'}
+[10.698044] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/environment/ament_prefix_path.dsv\n'}
+[10.698154] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/environment/path.sh\n'}
+[10.698261] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/environment/path.dsv\n'}
+[10.698411] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/local_setup.bash\n'}
+[10.698535] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/local_setup.sh\n'}
+[10.698641] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/local_setup.zsh\n'}
+[10.698743] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/local_setup.dsv\n'}
+[10.698856] (frtl_2024_demo) StdoutLine: {'line': b'-- Installing: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/package.dsv\n'}
+[10.699029] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/ament_index/resource_index/packages/frtl_2024_demo\n'}
+[10.699200] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/cmake/frtl_2024_demoConfig.cmake\n'}
+[10.699322] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/cmake/frtl_2024_demoConfig-version.cmake\n'}
+[10.699429] (frtl_2024_demo) StdoutLine: {'line': b'-- Up-to-date: /home/vinicius/frtl_2024_ws/src/frtl_2024/frtl_2024_demo/install/frtl_2024_demo/share/frtl_2024_demo/package.xml\n'}
+[10.702405] (frtl_2024_demo) CommandEnded: {'returncode': 0}
+[10.744516] (-) TimerEvent: {}
+[10.790817] (frtl_2024_demo) JobEnded: {'identifier': 'frtl_2024_demo', 'rc': 0}
+[10.791683] (-) EventReactorShutdown: {}
