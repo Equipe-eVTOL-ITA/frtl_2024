@@ -23,6 +23,10 @@ public:
         this->initial_x = pos[0];
         this->initial_y = pos[1];
         this->initial_yaw = orientation[0];
+        drone->log("Arming state is:" + std::to_string(drone->getArmingState()));
+        drone->log("x: " + std::to_string(pos[0]));
+        drone->log("y: " + std::to_string(pos[1]));
+        drone->log("z: " + std::to_string(pos[2]));
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
@@ -40,11 +44,6 @@ public:
             return "TAKEOFF COMPLETED";
 
         drone->setLocalPosition(this->initial_x, this->initial_y, *z, this->initial_yaw);
-
-        drone->log("x: " + std::to_string(drone->current_pos_x_));
-        drone->log("y: " + std::to_string(drone->current_pos_y_));
-        drone->log("z: " + std::to_string(drone->current_pos_z_));
-
         
         return "";
     }

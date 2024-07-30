@@ -559,6 +559,36 @@ void Drone::setOffboardMode() {
 	);
 }
 
+void Drone::toPositionSync() {
+	for (int i = 0; i < 10; i++){
+		this->sendCommand(
+			px4_msgs::msg::VehicleCommand::VEHICLE_CMD_DO_SET_MODE,
+			this->target_system_,
+			this->target_component_,
+			this->source_system_,
+			this->source_component_,
+			this->confirmation_,
+			this->from_external_,
+			1.0f,
+			7.0f
+		);
+		usleep(1e5);
+	}
+}
+
+void Drone::setHomePosition() {
+	this->sendCommand(
+		px4_msgs::msg::VehicleCommand::VEHICLE_CMD_DO_SET_HOME,
+		this->target_system_,
+		this->target_component_,
+		this->source_system_,
+		this->source_component_,
+		this->confirmation_,
+		this->from_external_,
+		1.0f
+	);
+}
+
 void Drone::sendCommand(
 	uint32_t command, uint8_t target_system, uint8_t target_component, uint8_t source_system,
 	uint8_t source_component, uint8_t confirmation, bool from_external,

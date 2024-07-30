@@ -159,6 +159,10 @@ public:
 	void setOffboardControlMode(DronePX4::CONTROLLER_TYPE type);
 	
 	void toOffboardSync();
+
+	void toPositionSync();
+
+	void setHomePosition() 
 	
 	void setOffboardMode();
 
