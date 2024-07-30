@@ -476,6 +476,9 @@ void Drone::setLocalPositionSync(
 }
 
 void Drone::setLocalVelocity(float vx, float vy, float vz, float yaw_rate) {
+	
+	this->setOffboardControlMode(DronePX4::CONTROLLER_TYPE::VELOCITY);
+	
 	px4_msgs::msg::TrajectorySetpoint msg;
 
 	msg.timestamp = this->px4_node_->get_clock()->now().nanoseconds() / 1000;

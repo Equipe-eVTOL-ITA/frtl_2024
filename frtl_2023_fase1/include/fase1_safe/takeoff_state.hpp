@@ -13,13 +13,18 @@ public:
 
         drone_ = blackboard.get<Drone>("drone");
         if (drone_ == nullptr) return;
-        drone_->log("Taking off.");
+        drone_->log("Taking offf.");
 
+        drone_->log("0");
         bases_ = blackboard.get<std::vector<Base>>("Bases");
+        drone_->log("-1");
         h_ = blackboard.get<float>("height");
 
+        drone_->log("1");
         drone_->toOffboardSync();
+        drone_->log("2");
         drone_->armSync();
+        drone_->log("3");
         
         Eigen::Vector3d pos = drone_->getLocalPosition();
         Eigen::Vector3d orient = drone_->getOrientation();
