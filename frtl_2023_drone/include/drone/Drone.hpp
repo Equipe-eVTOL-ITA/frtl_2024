@@ -162,7 +162,7 @@ public:
 
 	void toPositionSync();
 
-	void setHomePosition() 
+	void setHomePosition();
 	
 	void setOffboardMode();
 

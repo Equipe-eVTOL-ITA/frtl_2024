@@ -13,16 +13,20 @@ public:
         Drone* drone = blackboard.get<Drone>("drone");
         if (drone == nullptr) return;
         drone->log("Taking off");
-
+        
+        drone->setHomePosition();
         drone->toOffboardSync();
         drone->arm();
         
         Eigen::Vector3d pos = drone->getLocalPosition(),
                         orientation = drone->getOrientation();
 
-        this->initial_x = pos[0];
-        this->initial_y = pos[1];
-        this->initial_yaw = orientation[0];
+        this->initial_x_ = pos[0];
+        this->initial_y_ = pos[1];
+        this->initial_yaw_ = orientation[0];
+        this->target_height_ = *blackboard.get<float>("height");
+        blackboard.set<float>("takeoff_height", pos[2]);
+
         drone->log("Arming state is:" + std::to_string(drone->getArmingState()));
         drone->log("x: " + std::to_string(pos[0]));
         drone->log("y: " + std::to_string(pos[1]));
@@ -34,19 +38,17 @@ public:
         Drone* drone = blackboard.get<Drone>("drone");
         if (drone == nullptr) return "SEG FAULT";
 
-        float* z =  blackboard.get<float>("height");
-        if (z == nullptr) return "SEG FAULT";
-
         Eigen::Vector3d pos  = drone->getLocalPosition(),
-                        goal = Eigen::Vector3d({this->initial_x, this->initial_y, *z});
+                        goal = Eigen::Vector3d({this->initial_x_, this->initial_y_, this->target_height_});
 
-        if ((pos-goal).norm() < 0.15)
+        if ((pos-goal).norm() < 0.10)
             return "TAKEOFF COMPLETED";
 
-        drone->setLocalPosition(this->initial_x, this->initial_y, *z, this->initial_yaw);
+        drone->setLocalPosition(this->initial_x_, this->initial_y_, this->target_height_, this->initial_yaw_);
         
         return "";
     }
 
-    float initial_x, initial_y, initial_yaw;
+private:
+    float initial_x_, initial_y_, target_height_, initial_yaw_;
 };

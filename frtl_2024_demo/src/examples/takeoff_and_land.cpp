@@ -18,7 +18,7 @@ public:
         this->add_state("TAKEOFF", std::make_unique<TakeoffState>());
         this->add_transitions("TAKEOFF", {{"TAKEOFF COMPLETED", "LAND"},{"SEG FAULT", "ERROR"}});
         this->add_state("LAND", std::make_unique<LandState>());
-        this->add_transitions("LAND", {{"LAND COMPLETED", "FINISHED"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("LAND", {{"LANDING COMPLETED", "FINISHED"},{"SEG FAULT", "ERROR"}});
 
     }
 };

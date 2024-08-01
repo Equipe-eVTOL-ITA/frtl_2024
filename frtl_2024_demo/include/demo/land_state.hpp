@@ -11,7 +11,14 @@ public:
         if (drone == nullptr) return;
         drone->log("Entering landing state.");
 
-        Eigen::Vector3d pos = drone->getLocalPosition();
+        Eigen::Vector3d pos = drone->getLocalPosition(),
+                        orientation = drone->getOrientation();
+
+        this->initial_x_ = pos[0];
+        this->initial_y_ = pos[1];
+        this->initial_yaw_ = orientation[0];
+        this->landing_height_ = *blackboard.get<float>("takeoff_height") - 0.05;
+
         drone->log("x: " + std::to_string(pos[0]));
         drone->log("y: " + std::to_string(pos[1]));
         drone->log("z: " + std::to_string(pos[2]));
@@ -23,15 +30,17 @@ public:
         Drone* drone = blackboard.get<Drone>("drone");
         if (drone == nullptr) return "SEG FAULT";
 
-        drone->setLocalVelocity(0.0f, 0.0f, +0.3f, 0.0f);
-        drone->log("Arming state is:" + std::to_string(drone->getArmingState()));
-        drone->log("Ground speed is: ");
+        Eigen::Vector3d pos  = drone->getLocalPosition(),
+                        goal = Eigen::Vector3d({this->initial_x_, this->initial_y_, this->landing_height_});
 
-        if (drone->getGroundSpeed() == 0.0f){
-            drone->log("Velocity is below 0.1f, landing completed.");
-            return "LAND COMPLETED";
+        if ((pos-goal).norm() < 0.10){
+            usleep(2*1e6); //wait 2 seconds
+            drone->disarm();
+            return "LANDING COMPLETED";
         }
 
+        drone->setLocalPosition(this->initial_x_, this->initial_y_, this->landing_height_, this->initial_yaw_);
+        
         return "";
     }
 
@@ -41,4 +50,7 @@ public:
 
         drone->toPositionSync();
     }
+
+private:
+    float initial_x_, initial_y_, landing_height_, initial_yaw_;
 };
