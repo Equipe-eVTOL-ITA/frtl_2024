@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(frtl_2023_drone)
+project(frtl_2024_drone)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -31,11 +31,11 @@ endif()
 include_directories(include)
 
 # define a library target called my_value_converter_library
-add_library(frtl_2023_drone_lib SHARED
+add_library(frtl_2024_drone_lib SHARED
   src/Drone.cpp
 )
 
-ament_target_dependencies(frtl_2023_drone_lib
+ament_target_dependencies(frtl_2024_drone_lib
   Eigen3
   px4_msgs
   rclcpp
@@ -43,7 +43,7 @@ ament_target_dependencies(frtl_2023_drone_lib
   cv_bridge
 )
 
-ament_export_targets(frtl_2023_drone_lib HAS_LIBRARY_TARGET)
+ament_export_targets(frtl_2024_drone_lib HAS_LIBRARY_TARGET)
 
 ament_export_dependencies(Eigen3 px4_msgs rclcpp tf2 cv_bridge)
  
@@ -55,8 +55,8 @@ install(
 )
  
 install(
-  TARGETS frtl_2023_drone_lib
-  EXPORT frtl_2023_drone_lib
+  TARGETS frtl_2024_drone_lib
+  EXPORT frtl_2024_drone_lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin

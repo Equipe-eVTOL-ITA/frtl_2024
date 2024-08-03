@@ -8,7 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(fsm REQUIRED)
-find_package(frtl_2023_drone REQUIRED)
+find_package(frtl_2024_drone REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -27,7 +27,7 @@ add_executable(takeoff_and_land
 ament_target_dependencies(takeoff_and_land
   rclcpp
   fsm
-  frtl_2023_drone
+  frtl_2024_drone
   Eigen3
 )
 
@@ -38,7 +38,7 @@ add_executable(circle
 ament_target_dependencies(circle
   rclcpp
   fsm
-  frtl_2023_drone
+  frtl_2024_drone
   Eigen3
 )
 

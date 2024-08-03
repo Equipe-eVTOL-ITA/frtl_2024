@@ -146,8 +146,8 @@ public:
 		double y,
 		double z,
 		double yaw = std::numeric_limits<float>::quiet_NaN(),
-		double airspeeed = 15.0,
-		double distance_threshold = 10.0,
+		double airspeeed = 2.0,
+		double distance_threshold = 0.1,
 		DronePX4::CONTROLLER_TYPE controller_type = DronePX4::CONTROLLER_TYPE::POSITION);
 
 	void setLocalVelocity(float vx, float vy, float vz, float yaw_rate = 0.0f);
