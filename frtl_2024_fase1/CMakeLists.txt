@@ -30,9 +30,22 @@ ament_target_dependencies(fase1
   Eigen3
 )
 
+add_executable(fase1_dummy
+  src/fase1_dummy.cpp
+)
+
+ament_target_dependencies(fase1_dummy
+  rclcpp
+  fsm
+  frtl_2024_drone
+  #frtl_2024_cv_utils
+  Eigen3
+)
+
 install(
   TARGETS
     fase1
+    fase1_dummy
   DESTINATION lib/${PROJECT_NAME}
 )
 
