@@ -12,6 +12,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <vision_msgs/msg/detection2_d_array.hpp>
+
 
 #include <px4_msgs/msg/vehicle_status.hpp>
 #include <px4_msgs/msg/vtol_vehicle_status.hpp>
@@ -96,7 +98,17 @@ enum CONTROLLER_TYPE
   	VELOCITY = 2,             // Velocity control
   	BODY_RATES = 3,           // Body rates (rad/s) and thrust [-1, 1] controller
 };
+
+struct BoundingBox
+{
+	double center_x;
+	double center_y;
+	double size_x;
+	double size_y;
+};
 } // namespace DronePX4
+
+
 
 class Drone
 {
@@ -181,7 +193,7 @@ public:
 	void publish_image(const std::string& topic_name, const cv_bridge::CvImagePtr& cv_ptr);
 	void publish_image(const std::string& topic_name, const cv::Mat& cv_ptr);
 
-
+	DronePX4::BoundingBox getBoundingBox();
 	
 private:
 	/// Send command to PX4
@@ -238,6 +250,8 @@ private:
 
 	rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr vertical_camera_sub_;
 
+	rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr classification_sub_;
+
 
 	// Service clients
 	rclcpp::Node::SharedPtr px4_node_;
@@ -276,6 +290,9 @@ private:
 	float roll_{0};
 	float pitch_{0};
 	float yaw_{0};
+
+	std::vector<DronePX4::BoundingBox> detections_;
+
 
 	std::unordered_map<std::string, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr> image_publishers_;
 	

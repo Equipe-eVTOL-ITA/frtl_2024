@@ -12,6 +12,7 @@ find_package(frtl_2024_drone REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(vision_msgs REQUIRED)
 
 include_directories(include)
 
@@ -29,6 +30,7 @@ ament_target_dependencies(takeoff_and_land
   fsm
   frtl_2024_drone
   Eigen3
+  vision_msgs
 )
 
 add_executable(circle
@@ -40,6 +42,7 @@ ament_target_dependencies(circle
   fsm
   frtl_2024_drone
   Eigen3
+  vision_msgs
 )
 
 

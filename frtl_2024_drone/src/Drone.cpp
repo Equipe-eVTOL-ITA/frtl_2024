@@ -11,6 +11,8 @@
 #include "px4_msgs/msg/vehicle_local_position_setpoint.hpp"
 #include "tf2/utils.h"
 
+#include <vision_msgs/msg/detection2_d_array.hpp>
+
 Drone::Drone() {
 
 	//if (argc != 0 && argv != nullptr) {
@@ -266,6 +268,21 @@ Drone::Drone() {
 		qos_profile,
 		[this](sensor_msgs::msg::Image::SharedPtr msg) {
 			horizontal_cv_ptr_ = cv_bridge::toCvCopy(msg, msg->encoding);
+		}
+	);
+
+	this->classification_sub_ = this->px4_node_->create_subscription<vision_msgs::msg::Detection2DArray>(
+		"/vertical_classification",
+		qos_profile,
+		[this](vision_msgs::msg::Detection2DArray::SharedPtr msg){
+			detections_.clear();
+			for (const auto &detection : msg->detections) {
+				bbox_center_x_ = detection.bbox.center.position.x;
+				bbox_center_y_ = detection.bbox.center.position.y;
+				bbox_size_x_ = detection.bbox.size_x;
+				bbox_size_y_ = detection.bbox.size_y;
+				detections_.push_back({bbox_center_x_, bbox_center_y_, bbox_size_x_, bbox_size_y_});
+			}
 		}
 	);
 
@@ -690,4 +707,10 @@ std::unordered_map<std::string, std::string> Drone::encoding_map_ = {
 	{"CV_32FC1", "32FC1"},
 	{"CV_32FC3", "32FC3"}	
 };
+
+std::vector<DronePX4::BoundingBox> Drone::getBoundingBox(){
+	return detections_;
+}
+
+
 

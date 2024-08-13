@@ -15,6 +15,7 @@ find_package(Eigen3 REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 #find_package(nlohmann_json CONFIG REQUIRED)
+find_package(vision_msgs REQUIRED)
 
 include_directories(include)
 
@@ -28,6 +29,7 @@ ament_target_dependencies(fase1
   frtl_2024_drone
   #frtl_2024_cv_utils
   Eigen3
+  vision_msgs
 )
 
 add_executable(fase1_dummy
@@ -40,6 +42,7 @@ ament_target_dependencies(fase1_dummy
   frtl_2024_drone
   #frtl_2024_cv_utils
   Eigen3
+  vision_msgs
 )
 
 install(

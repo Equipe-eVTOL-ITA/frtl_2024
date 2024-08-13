@@ -13,6 +13,7 @@ find_package(px4_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(vision_msgs)
 
 
 
@@ -41,6 +42,7 @@ ament_target_dependencies(frtl_2024_drone_lib
   rclcpp
   tf2
   cv_bridge
+  vision_msgs
 )
 
 ament_export_targets(frtl_2024_drone_lib HAS_LIBRARY_TARGET)
