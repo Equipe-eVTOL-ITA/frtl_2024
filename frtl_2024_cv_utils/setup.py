@@ -5,9 +5,8 @@ package_name = 'frtl_2024_cv_utils'
 setup(
     name=package_name,
     version='0.1.0',
-    packages=find_packages(where='python_modules'),
-    package_dir={'': 'python_modules'},
-    install_requires=['setuptools'],
+    packages=find_packages(),
+    install_requires=['setuptools', 'ultralytics'],
     zip_safe=True,
     maintainer='Your Name',
     maintainer_email='your.email@example.com',
