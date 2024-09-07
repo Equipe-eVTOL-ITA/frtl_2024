@@ -13,7 +13,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <vision_msgs/msg/detection2_d_array.hpp>
-
+#include <custom_msgs/msg/gesture.hpp>
+#include <custom_msgs/msg/hand_location.hpp>
 
 #include <px4_msgs/msg/vehicle_status.hpp>
 #include <px4_msgs/msg/vtol_vehicle_status.hpp>
@@ -193,7 +194,10 @@ public:
 	void publish_image(const std::string& topic_name, const cv_bridge::CvImagePtr& cv_ptr);
 	void publish_image(const std::string& topic_name, const cv::Mat& cv_ptr);
 
-	DronePX4::BoundingBox getBoundingBox();
+	std::vector<std::string> getHandGestures();
+	std::array<float, 2> getHandLocation();
+
+	std::vector<DronePX4::BoundingBox> getBoundingBox();
 	
 private:
 	/// Send command to PX4
@@ -252,6 +256,11 @@ private:
 
 	rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr classification_sub_;
 
+	rclcpp::Subscription<custom_msgs::msg::Gesture>::SharedPtr gesture_sub_;
+
+	rclcpp::Subscription<custom_msgs::msg::HandLocation>::SharedPtr hand_location_sub_;
+
+
 
 	// Service clients
 	rclcpp::Node::SharedPtr px4_node_;
@@ -292,7 +301,15 @@ private:
 	float yaw_{0};
 
 	std::vector<DronePX4::BoundingBox> detections_;
+	float bbox_center_x_;
+	float bbox_center_y_;
+	float bbox_size_x_;
+	float bbox_size_y_;
 
+	std::vector<std::string> gestures_{"", ""};
+
+	float hand_location_x_{0.0};
+	float hand_location_y_{0.0};
 
 	std::unordered_map<std::string, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr> image_publishers_;
 	

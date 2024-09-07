@@ -1,21 +1,23 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>frtl_2024_drone</name>
+  <name>frtl_2024_fase4</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="moisesmgft@gmail.com">Moisés Moreira Gonçalves Feltrin Thimoteo</maintainer>
+  <maintainer email="vinicecconp@gmail.com">vinicius</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>ament_python</build_depend>
 
-  <depend>rclcpp</depend>
-  <depend>px4_msgs</depend>
-  <depend>tf2</depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>custom_msgs</exec_depend>
+  <exec_depend>px4_msgs</exec_depend>
+
+  <depend>frtl_2024_drone</depend>
+  <depend>fsm</depend>
   <depend>Eigen3</depend>
-  <depend>vision_msgs</depend>
-  <depend>custom_msgs</depend>
-
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

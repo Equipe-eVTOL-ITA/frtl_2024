@@ -4,50 +4,72 @@
 
 #include <opencv2/highgui.hpp>
 
+#include "arena_point.hpp"
+
 class InitialTakeoffState : public fsm::State {
 public:
     InitialTakeoffState() : fsm::State() {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
 
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
 
-        drone_->log("STATE: INITIAL TAKEOFF");
+        drone->log("STATE: INITIAL TAKEOFF");
 
-        drone_->setHomePosition();
-        drone_->toOffboardSync();
-        drone_->arm();
+        drone->setHomePosition();
+        drone->toOffboardSync();
+        drone->armSync();
         
-        Eigen::Vector3d pos = drone_->getLocalPosition(),
-                        orientation = drone_->getOrientation();
+        pos = drone->getLocalPosition();
+        orientation = drone->getOrientation();
 
         blackboard.set<Eigen::Vector3d>("home_position", pos);
         
-        this->initial_x_ = pos[0];
-        this->initial_y_ = pos[1];
-        this->initial_yaw_ = orientation[0];
-        this->target_height_ = *blackboard.get<float>("takeoff_height") + pos[2];
+        float target_height = *blackboard.get<float>("takeoff_height");
 
-        drone_->log("Home at: " + std::to_string(pos[0])
-                    + " " + std::to_string(pos[2]) + " " + std::to_string(pos[2]));
+        drone->log("Home at: " + std::to_string(pos[0])
+                    + " " + std::to_string(pos[1]) + " " + std::to_string(pos[2]));
+
+
+        // ARENA POINTS
+        std::vector<ArenaPoint> waypoints;
+        Eigen::Vector3d fictual_home = Eigen::Vector3d({2.2, 8.0, -0.6});
+
+        waypoints.push_back({Eigen::Vector3d({2.0, 8.0, target_height})}); 
+        waypoints.push_back({Eigen::Vector3d({2.0, 2.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({4.0, 2.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({4.0, 8.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, 8.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, 2.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({8.0, 2.0, target_height})});
+        waypoints.push_back({Eigen::Vector3d({8.0, 8.0, target_height})});
+        //Correcting coordinates based on spawn point
+        for (ArenaPoint& waypoint : waypoints){
+            waypoint.coordinates = waypoint.coordinates - fictual_home + pos;
+        }
+        target_height += pos[2] - fictual_home[2];
+
+        blackboard.set<std::vector<ArenaPoint>>("waypoints", waypoints);
+        blackboard.set<float>("takeoff_height", target_height);
+
+        goal = Eigen::Vector3d({pos[0], pos[1], target_height});
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void)blackboard;
         
-        Eigen::Vector3d pos  = drone_->getLocalPosition(),
-                        goal = Eigen::Vector3d({this->initial_x_, this->initial_y_, this->target_height_});
+        pos  = drone->getLocalPosition();
 
-        if ((pos-goal).norm() < 0.10)
+        if ((pos-goal).norm() < 0.20)
             return "INITIAL TAKEOFF COMPLETED";
 
-        drone_->setLocalPosition(this->initial_x_, this->initial_y_, this->target_height_, this->initial_yaw_);
+        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[0]);
         
         return "";
     }
 
 private:
-    float initial_x_, initial_y_, target_height_, initial_yaw_;
-    Drone* drone_;
+    Eigen::Vector3d pos, orientation, goal;
+    Drone* drone;
 };
