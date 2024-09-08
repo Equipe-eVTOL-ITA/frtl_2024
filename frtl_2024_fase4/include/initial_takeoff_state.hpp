@@ -37,10 +37,12 @@ public:
         
         pos  = drone->getLocalPosition();
 
-        if ((pos-goal).norm() < 0.15)
+        if ((pos-goal).norm() < 0.10)
             return "INITIAL TAKEOFF COMPLETED";
 
         drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
+
+        usleep(5e04); // Throttle to approx 20 Hz
         
         return "";
     }

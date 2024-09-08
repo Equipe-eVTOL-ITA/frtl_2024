@@ -31,6 +31,7 @@ public:
 
         drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
         
+        usleep(5e04); // Throttle to approx 20 Hz
         return "";
     }
 

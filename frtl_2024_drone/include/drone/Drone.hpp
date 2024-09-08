@@ -196,6 +196,7 @@ public:
 
 	std::vector<std::string> getHandGestures();
 	std::array<float, 2> getHandLocation();
+	void resetHands();
 
 	std::vector<DronePX4::BoundingBox> getBoundingBox();
 	
@@ -308,8 +309,8 @@ private:
 
 	std::vector<std::string> gestures_{"", ""};
 
-	float hand_location_x_{0.0};
-	float hand_location_y_{0.0};
+	float hand_location_x_{0.5};
+	float hand_location_y_{0.5};
 
 	std::unordered_map<std::string, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr> image_publishers_;
 	

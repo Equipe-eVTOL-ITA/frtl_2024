@@ -738,3 +738,9 @@ std::vector<std::string> Drone::getHandGestures() {
 std::array<float, 2> Drone::getHandLocation() {
 	return {hand_location_x_, hand_location_y_};
 }
+
+void Drone::resetHands() {
+	hand_location_x_ = 0.5;
+	hand_location_y_ = 0.5;
+	gestures_ = {"", ""};
+}

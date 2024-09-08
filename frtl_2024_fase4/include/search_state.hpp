@@ -25,16 +25,6 @@ public:
                    std::to_string(min_yaw) + std::to_string(max_yaw));
     }
 
-    void on_exit(fsm::Blackboard &blackboard) override {
-        (void)blackboard;
-
-        //Set speed to 0.0 for 0.5 second
-        for (int i = 0; i < 5; i++){
-            drone->setLocalVelocity(0.0, 0.0, 0.0, 0.0);
-            sleep(0.1);
-        }
-    }
-
     std::string act(fsm::Blackboard &blackboard) override {
         (void)blackboard;
 
@@ -55,6 +45,7 @@ public:
         drone->setLocalVelocity(0.0, 0.0, 0.0, 
                                 clockwise ? yaw_speed : -yaw_speed);
 
+        usleep(5e04);
         return "";
     }
     

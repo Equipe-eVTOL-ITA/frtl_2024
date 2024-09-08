@@ -16,9 +16,9 @@ public:
 
         this->blackboard_set<Drone>("drone", new Drone());
 
-        this->blackboard_set<float>("takeoff height", -1.3);
+        this->blackboard_set<float>("takeoff height", -1.6);
         this->blackboard_set<float>("control speed", 0.5);
-        this->blackboard_set<float>("yaw speed", 0.2);
+        this->blackboard_set<float>("yaw speed", 0.3);
 
 
         this->add_state("INITIAL TAKEOFF", std::make_unique<InitialTakeoffState>());

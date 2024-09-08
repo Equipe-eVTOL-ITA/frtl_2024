@@ -11,21 +11,18 @@ public:
         if (drone == nullptr) return;
         drone->log("STATE: RETURN HOME");
 
-        home_pos = *blackboard.get<Eigen::Vector3d>("home_position");
+        home_pos = *blackboard.get<Eigen::Vector3d>("home position");
+        takeoff_height = *blackboard.get<float>("takeoff height");
         
-        pos = drone->getLocalPosition();
         orientation = drone->getOrientation();
 
-        goal = Eigen::Vector3d({home_pos[0], home_pos[1], pos[2]});        
+        goal = Eigen::Vector3d({home_pos[0], home_pos[1], takeoff_height});        
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
         (void)blackboard;
-
-        goal[2] = home_pos[2];
-        drone->setLocalPositionSync(goal[0], goal[1], goal[2] - 0.2, orientation[2]);
         
-        drone->log("At home, now entered Land Mode for precaution.");
+        drone->log("At home, now entered Land Mode.");
         drone->land();
         drone->disarmSync();
     }
@@ -45,5 +42,6 @@ public:
 
 private:
     Eigen::Vector3d home_pos, pos, orientation, goal;
+    float takeoff_height;
     Drone* drone;
 };

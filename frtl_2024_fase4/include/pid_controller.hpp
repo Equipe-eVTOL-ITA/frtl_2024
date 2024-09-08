@@ -22,7 +22,7 @@ public:
             previous_error_ = error;
             previous_time_ = current_time;
 
-            return output + 1.0;
+            return output;
         }
 
         return 0.0;
