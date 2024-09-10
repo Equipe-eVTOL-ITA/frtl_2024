@@ -6,7 +6,7 @@ setup(
     name=package_name,
     version='0.1.0',
     packages=find_packages(),
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'ultralytics'],
     zip_safe=True,
     maintainer='Your Name',
     maintainer_email='your.email@example.com',
