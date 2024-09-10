@@ -12,6 +12,9 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <vision_msgs/msg/detection2_d_array.hpp>
+#include <custom_msgs/msg/gesture.hpp>
+#include <custom_msgs/msg/hand_location.hpp>
 
 #include <px4_msgs/msg/vehicle_status.hpp>
 #include <px4_msgs/msg/vtol_vehicle_status.hpp>
@@ -96,7 +99,17 @@ enum CONTROLLER_TYPE
   	VELOCITY = 2,             // Velocity control
   	BODY_RATES = 3,           // Body rates (rad/s) and thrust [-1, 1] controller
 };
+
+struct BoundingBox
+{
+	double center_x;
+	double center_y;
+	double size_x;
+	double size_y;
+};
 } // namespace DronePX4
+
+
 
 class Drone
 {
@@ -181,7 +194,11 @@ public:
 	void publish_image(const std::string& topic_name, const cv_bridge::CvImagePtr& cv_ptr);
 	void publish_image(const std::string& topic_name, const cv::Mat& cv_ptr);
 
+	std::vector<std::string> getHandGestures();
+	std::array<float, 2> getHandLocation();
+	void resetHands();
 
+	std::vector<DronePX4::BoundingBox> getBoundingBox();
 	
 private:
 	/// Send command to PX4
@@ -238,6 +255,13 @@ private:
 
 	rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr vertical_camera_sub_;
 
+	rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr classification_sub_;
+
+	rclcpp::Subscription<custom_msgs::msg::Gesture>::SharedPtr gesture_sub_;
+
+	rclcpp::Subscription<custom_msgs::msg::HandLocation>::SharedPtr hand_location_sub_;
+
+
 
 	// Service clients
 	rclcpp::Node::SharedPtr px4_node_;
@@ -276,6 +300,17 @@ private:
 	float roll_{0};
 	float pitch_{0};
 	float yaw_{0};
+
+	std::vector<DronePX4::BoundingBox> detections_;
+	float bbox_center_x_;
+	float bbox_center_y_;
+	float bbox_size_x_;
+	float bbox_size_y_;
+
+	std::vector<std::string> gestures_{"", ""};
+
+	float hand_location_x_{0.5};
+	float hand_location_y_{0.5};
 
 	std::unordered_map<std::string, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr> image_publishers_;
 	

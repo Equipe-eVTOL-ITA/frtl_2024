@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from vision_msgs.msg import Detection2D, Detection2DArray, BoundingBox2D
@@ -28,17 +29,22 @@ class YoloClassifierNode(Node):
         # Load the model
         self.model = YOLO(self.model_path)
 
+        qos_profile = QoSProfile(
+        depth=10,
+        reliability=ReliabilityPolicy.BEST_EFFORT
+        )
+
         # Setup subscriber and publisher
         self.bridge = CvBridge()
         self.subscriber = self.create_subscription(
             Image,
             self.image_topic,
             self.image_callback,
-            10
+            qos_profile
         )
 
         # Set dynamic topic names based on the model name
-        classification_topic = f'/{model_name}_classification'
+        classification_topic = '/vertical_classification'
         image_topic = f'/{model_name}_image'
 
         self.classification_publisher_ = self.create_publisher(Detection2DArray, classification_topic, 10)
@@ -69,7 +75,7 @@ class YoloClassifierNode(Node):
                 detection.bbox = BoundingBox2D()
                 x_center, y_center, width, height = box.xywhn[0].cpu().numpy()
                 detection.bbox.center.position.x = float(x_center)
-                detection.bbox.center._position._y = float(y_center)
+                detection.bbox.center.position.y = float(y_center)
                 detection.bbox.size_x = float(width)
                 detection.bbox.size_y = float(height)
                 #detection.results.append({'score': box.conf[0], 'id': box.id})  # Adjust as needed

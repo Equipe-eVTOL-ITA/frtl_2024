@@ -11,6 +11,10 @@
 #include "px4_msgs/msg/vehicle_local_position_setpoint.hpp"
 #include "tf2/utils.h"
 
+#include <vision_msgs/msg/detection2_d_array.hpp>
+#include <custom_msgs/msg/gesture.hpp>
+#include <custom_msgs/msg/hand_location.hpp>
+
 Drone::Drone() {
 
 	//if (argc != 0 && argv != nullptr) {
@@ -129,7 +133,7 @@ Drone::Drone() {
 			case px4_msgs::msg::VehicleStatus::ARMING_STATE_ARMED:
 			this->arming_state_ = DronePX4::ARMING_STATE::ARMED;
 			break;
-			case px4_msgs::msg::VehicleStatus::ARMING_STATE_DISARMED:
+			case px4_msgs::msg::VehicleStatus::ARMING_STATE_STANDBY:
 			this->arming_state_ = DronePX4::ARMING_STATE::DISARMED;
 			break;
 			default:
@@ -266,6 +270,38 @@ Drone::Drone() {
 		qos_profile,
 		[this](sensor_msgs::msg::Image::SharedPtr msg) {
 			horizontal_cv_ptr_ = cv_bridge::toCvCopy(msg, msg->encoding);
+		}
+	);
+
+	this->classification_sub_ = this->px4_node_->create_subscription<vision_msgs::msg::Detection2DArray>(
+		"/vertical_classification",
+		qos_profile,
+		[this](vision_msgs::msg::Detection2DArray::SharedPtr msg){
+			detections_.clear();
+			for (const auto &detection : msg->detections) {
+				bbox_center_x_ = detection.bbox.center.position.x;
+				bbox_center_y_ = detection.bbox.center.position.y;
+				bbox_size_x_ = detection.bbox.size_x;
+				bbox_size_y_ = detection.bbox.size_y;
+				detections_.push_back({bbox_center_x_, bbox_center_y_, bbox_size_x_, bbox_size_y_});
+			}
+		}
+	);
+
+	this->gesture_sub_ = this->px4_node_->create_subscription<custom_msgs::msg::Gesture>(
+		"/gesture/classification",
+		qos_profile,
+		[this](custom_msgs::msg::Gesture::SharedPtr msg) {
+			this->gestures_ = msg->gestures;
+		}
+	);
+
+	this->hand_location_sub_ = this->px4_node_->create_subscription<custom_msgs::msg::HandLocation>(
+		"/gesture/hand_location",
+		qos_profile,
+		[this](custom_msgs::msg::HandLocation::SharedPtr msg) {
+			this->hand_location_x_ = msg->hand_x;
+			this->hand_location_y_ = msg->hand_y;
 		}
 	);
 
@@ -415,7 +451,7 @@ void Drone::land()
     0.1f,
     0,
     0,
-    1.57, // orientation
+    this->yaw_, // orientation
 	0.0f,
 	0.0f  
 	);
@@ -517,7 +553,7 @@ void Drone::setOffboardControlMode(DronePX4::CONTROLLER_TYPE type) {
 	msg.acceleration = false;
 	msg.attitude = false;
 	msg.body_rate = false;
-	msg.direct_actuator = false;
+	msg.actuator = false;
 
 	if (type == DronePX4::CONTROLLER_TYPE::POSITION) {
 		msg.position = true;
@@ -691,3 +727,20 @@ std::unordered_map<std::string, std::string> Drone::encoding_map_ = {
 	{"CV_32FC3", "32FC3"}	
 };
 
+std::vector<DronePX4::BoundingBox> Drone::getBoundingBox(){
+	return detections_;
+}
+
+std::vector<std::string> Drone::getHandGestures() { 
+	return gestures_;
+}
+
+std::array<float, 2> Drone::getHandLocation() {
+	return {hand_location_x_, hand_location_y_};
+}
+
+void Drone::resetHands() {
+	hand_location_x_ = 0.5;
+	hand_location_y_ = 0.5;
+	gestures_ = {"", ""};
+}

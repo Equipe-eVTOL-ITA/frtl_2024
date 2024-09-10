@@ -9,7 +9,7 @@ public:
     void on_enter(fsm::Blackboard &blackboard) override {
         drone_ = blackboard.get<Drone>("drone");
         if (drone_ == nullptr) return;
-        drone_->log("\nSTATE: RETURN HOME");
+        drone_->log("STATE: RETURN HOME");
 
         home_pos_ = *blackboard.get<Eigen::Vector3d>("home_position");
         pos_ = drone_->getLocalPosition();

@@ -5,78 +5,62 @@
 #include <iostream>
 #include <vector>
 #include "base.hpp"
+#include "get_next_point.hpp"
 
 class SearchBasesState : public fsm::State {
 public:
     SearchBasesState() : fsm::State() {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
 
-        drone_->log("STATE: SEARCH BASES");
+        drone->log("STATE: SEARCH BASES");
 
-        Eigen::Vector3d real_home = *blackboard.get<Eigen::Vector3d>("home_position"),
-                        fictual_home = Eigen::Vector3d({2.2, 8.0, -0.242});
+        orientation = drone->getOrientation();
 
-        std::vector<Base> bases;
+        waypoints_ptr = blackboard.get<std::vector<ArenaPoint>>("waypoints");
 
-        // Takeoff platform: (2.2, 8.0, -0.6)
-        bases.push_back({Eigen::Vector3d({8.0, 8.0, -1.0})}); //suspended landing platform 1
-        bases.push_back({Eigen::Vector3d({2.0, 5.0, -1.505})}); //suspended landing platform 2
-        bases.push_back({Eigen::Vector3d({5.0, 4.0, -0.005})}); //landing platform 1
-        bases.push_back({Eigen::Vector3d({7.0, 6.0, -0.005})}); //landing platform 2
-        bases.push_back({Eigen::Vector3d({3.0, 2.0, -0.005})}); //landing platform 3
-
-        //Correcting coordinates based on spawn point
-        for (Base& base : bases){
-            base.coordinates = base.coordinates - fictual_home + real_home;
+        Eigen::Vector3d* last_search_ptr = blackboard.get<Eigen::Vector3d>("last search position");
+        if (last_search_ptr != nullptr){
+            drone->log("Going to last search position.");
+            Eigen::Vector3d& last_search = *last_search_ptr;
+            drone->setLocalPositionSync(last_search[0], last_search[1], last_search[2], orientation[0]);
         }
-
-        blackboard.set<std::vector<Base>>("bases", bases);
-
-        //Circle variables
-        this->x_center_ = 5.0;
-        this->y_center_ = 5.0;
-        this->x_center_ += - fictual_home[0] + real_home[0];
-        this->y_center_ += - fictual_home[1] + real_home[1];
-        this->r_ = 2.0;
-        this->w_ = 0.4;
-        this->timeout_ = 2 * acos(-1) / this->w_;
-        this->start_time_ = this->drone_->getTime();
-        
-        this->orient_ = drone_->getOrientation();
-        this->pos_ = drone_->getLocalPosition();
-
-        drone_->log("Moving to initial search location");
-        drone_->setLocalPositionSync(this->x_center_ + this->r_, this->y_center_, this->pos_[2], this->orient_[0]);
-        drone_->log("Starting search movement");
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
-        (void)blackboard;
-
-        drone_->log("Going back to initial location");
-        drone_->setLocalPositionSync(this->pos_[0], this->pos_[1], this->pos_[2], this->orient_[0]);
+        pos = drone->getLocalPosition();
+        
+        blackboard.set<Eigen::Vector3d>("last search position", pos);
+        
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void)blackboard;
-
-        double dt = this->drone_->getTime() - this->start_time_;
-        if (dt > this->timeout_)
-            return "BASES FOUND";
-
-        float x = r_ * cos(w_ * dt) + x_center_;
-        float y = r_ * sin(w_ * dt) + y_center_;
-
-        this->drone_->setLocalPosition(x, y, this->pos_[2], this->orient_[0]);
         
-        return "";
+        pos = drone->getLocalPosition();
+        goal_ptr = getNextPoint(waypoints_ptr);
+
+        if (goal_ptr == nullptr)
+            return "SEARCH ENDED";
+
+        if ((pos - goal_ptr->coordinates).norm() < 0.15){
+            goal_ptr->is_visited = true;
+            drone->log("Waypoint visited.");
+        }
+
+        goal = goal_ptr->coordinates;
+        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[0]);
+
+        //target_detection = Yolo_Detection
+        
+        return ""; 
     }
     
 private:
-    float r_, w_, timeout_, start_time_, x_center_, y_center_;
-    Drone* drone_;
-    Eigen::Vector3d pos_, orient_;
+    Drone* drone;
+    Eigen::Vector3d pos, orientation, goal;
+    ArenaPoint* goal_ptr;
+    std::vector<ArenaPoint>* waypoints_ptr;
 };

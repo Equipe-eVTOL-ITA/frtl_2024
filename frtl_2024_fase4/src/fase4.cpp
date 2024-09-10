@@ -1,11 +1,11 @@
-#include "fase1/initial_takeoff_state.hpp"
-#include "fase1/landing_state.hpp"
-#include "fase1/return_home_state.hpp"
-#include "fase1/search_bases_state.hpp"
-#include "fase1/takeoff_state.hpp"
-#include "fase1/visit_bases_state.hpp"
+#include "initial_takeoff_state.hpp"
+#include "landing_state.hpp"
+#include "return_home_state.hpp"
+#include "search_state.hpp"
+#include "takeoff_state.hpp"
+#include "gesture_control_state.hpp"
 #include <rclcpp/rclcpp.hpp>
-
+ 
 #include <memory>
 #include <iostream>
 
@@ -15,33 +15,34 @@ public:
     Fase1FSM() : fsm::FSM({"ERROR", "FINISHED"}) {
 
         this->blackboard_set<Drone>("drone", new Drone());
-        //Drone* drone = blackboard_get<Drone>("drone");
 
-        this->blackboard_set<float>("takeoff_height", -3.0);
+        this->blackboard_set<float>("takeoff height", -1.6);
+        this->blackboard_set<float>("control speed", 0.5);
+        this->blackboard_set<float>("yaw speed", 0.3);
+
 
         this->add_state("INITIAL TAKEOFF", std::make_unique<InitialTakeoffState>());
-        this->add_state("SEARCH BASES", std::make_unique<SearchBasesState>());
-        this->add_state("VISIT BASE", std::make_unique<VisitBasesState>());
+        this->add_state("SEARCH", std::make_unique<SearchState>());
+        this->add_state("GESTURE CONTROL", std::make_unique<GestureControlState>());
         this->add_state("LANDING", std::make_unique<LandingState>());
         this->add_state("TAKEOFF", std::make_unique<TakeoffState>());
         this->add_state("RETURN HOME", std::make_unique<ReturnHomeState>());
 
         // Initial Takeoff transitions
-        this->add_transitions("INITIAL TAKEOFF", {{"INITIAL TAKEOFF COMPLETED", "SEARCH BASES"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("INITIAL TAKEOFF", {{"INITIAL TAKEOFF COMPLETED", "SEARCH"},{"SEG FAULT", "ERROR"}});
 
-        // Search Bases transitions
-        this->add_transitions("SEARCH BASES", {{"BASES FOUND", "VISIT BASE"},{"SEG FAULT", "ERROR"}});
-        this->add_transitions("SEARCH BASES", {{"SEARCH ENDED", "RETURN HOME"},{"SEG FAULT", "ERROR"}});
+        // Search transitions
+        this->add_transitions("SEARCH", {{"HAND FOUND", "GESTURE CONTROL"},{"SEG FAULT", "ERROR"}});
 
-        // Visit Base transitions
-        this->add_transitions("VISIT BASE", {{"ARRIVED AT BASE", "LANDING"},{"SEG FAULT", "ERROR"}});
+        // Gesture Control transitions
+        this->add_transitions("GESTURE CONTROL", {{"LAND NOW", "LANDING"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("GESTURE CONTROL", {{"GO HOME", "RETURN HOME"},{"SEG FAULT", "ERROR"}});
 
         // Landing transitions
         this->add_transitions("LANDING", {{"LANDED", "TAKEOFF"},{"SEG FAULT", "ERROR"}});
 
         // Takeoff transitions
-        this->add_transitions("TAKEOFF", {{"NEXT BASE", "SEARCH BASES"},{"SEG FAULT", "ERROR"}});
-        this->add_transitions("TAKEOFF", {{"FINISHED BASES", "RETURN HOME"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("TAKEOFF", {{"TAKEOFF COMPLETED", "GESTURE CONTROL"},{"SEG FAULT", "ERROR"}});
 
         // Return Home transitions
         this->add_transitions("RETURN HOME", {{"AT HOME", "FINISHED"},{"SEG FAULT", "ERROR"}});
@@ -51,7 +52,7 @@ public:
 
 class NodeFSM : public rclcpp::Node {
 public:
-    NodeFSM() : rclcpp::Node("fase1_node") {}
+    NodeFSM() : rclcpp::Node("fase4_node") {}
     Fase1FSM my_fsm;
 };
 
