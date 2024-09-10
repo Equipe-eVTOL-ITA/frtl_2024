@@ -13,8 +13,11 @@ public:
 
         pos = drone->getLocalPosition();
 
-        drone->land();
-        sleep(3);
+        for (int i = 0; i < 10; i++){
+            drone->land();
+            sleep(0.1);
+        }
+        sleep(2);
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
@@ -31,8 +34,8 @@ public:
     void on_exit(fsm::Blackboard &blackboard) override {
         (void) blackboard;
 
-        //Descend for 3s at 0.4m/s to make sure it is landed
-        for (int i = 0 ;i < 30; i++){
+        //Descend for 1s at 0.4m/s to make sure it is landed
+        for (int i = 0 ;i < 10; i++){
             drone->setLocalVelocity(0.0, 0.0, 0.4, 0.0);
             usleep(1e5);
         }

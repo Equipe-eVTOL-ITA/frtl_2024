@@ -23,7 +23,11 @@ public:
         (void)blackboard;
         
         drone->log("At home, now entered Land Mode.");
-        drone->land();
+        for (int i = 0; i < 10; i++){
+            drone->land();
+            sleep(0.1);
+        }
+        sleep(5);
         drone->disarmSync();
     }
 
