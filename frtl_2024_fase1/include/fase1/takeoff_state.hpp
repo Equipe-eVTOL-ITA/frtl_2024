@@ -42,7 +42,7 @@ public:
                 return "NEXT BASE";
         }
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[0]);
+        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[2]);
         
         return "";
     }

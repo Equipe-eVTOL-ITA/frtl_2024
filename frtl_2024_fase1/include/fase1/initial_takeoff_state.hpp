@@ -64,7 +64,7 @@ public:
         if ((pos-goal).norm() < 0.20)
             return "INITIAL TAKEOFF COMPLETED";
 
-        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[0]);
+        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
         
         return "";
     }

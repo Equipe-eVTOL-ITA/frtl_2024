@@ -15,7 +15,7 @@ public:
         pos_ = drone_->getLocalPosition();
         orientation_ = drone_->getOrientation();
 
-        goal_ = Eigen::Vector3d({home_pos_[0], home_pos_[1], pos_[2]});
+        goal_ = Eigen::Vector3d({home_pos_[0], home_pos_[1], pos_[2] - 0.1});
         
         drone_->log("Going to home at: " + std::to_string(goal_[0]) + " " + std::to_string(goal_[1]));
     }
@@ -24,7 +24,7 @@ public:
         (void)blackboard;
 
         goal_[2] = home_pos_[2];
-        drone_->setLocalPositionSync(goal_[0], goal_[1], goal_[2], orientation_[0]);
+        drone_->setLocalPositionSync(goal_[0], goal_[1], goal_[2], orientation_[2]);
         
         drone_->log("At home, now entered Land Mode for precaution.");
         drone_->land();
@@ -39,7 +39,7 @@ public:
         if ((pos_-goal_).norm() < 0.10)
             return "AT HOME";
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[0]);
+        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[2]);
         
         return "";
     }

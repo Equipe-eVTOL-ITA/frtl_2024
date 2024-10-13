@@ -9,7 +9,7 @@ def generate_launch_description():
     # Declare launch arguments
     model_name_arg = DeclareLaunchArgument(
         'model',
-        default_value='yolo_v1',
+        default_value='yolo_v3',
         description='Name of the model to load'
     )
     image_topic_arg = DeclareLaunchArgument(

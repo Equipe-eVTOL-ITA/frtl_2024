@@ -301,11 +301,11 @@ private:
 	float pitch_{0};
 	float yaw_{0};
 
-	std::vector<DronePX4::BoundingBox> detections_;
-	float bbox_center_x_;
-	float bbox_center_y_;
-	float bbox_size_x_;
-	float bbox_size_y_;
+	std::vector<DronePX4::BoundingBox> detections_{};
+	float bbox_center_x_{0.0};
+	float bbox_center_y_{0.0};
+	float bbox_size_x_{0.0};
+	float bbox_size_y_{0.0};
 
 	std::vector<std::string> gestures_{"", ""};
 

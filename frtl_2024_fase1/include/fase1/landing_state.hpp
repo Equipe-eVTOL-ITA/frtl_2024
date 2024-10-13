@@ -17,7 +17,7 @@ public:
 
         pos_ = drone_->getLocalPosition();
         Eigen::Vector3d orientation = drone_->getOrientation();
-        initial_yaw_ = orientation[0];
+        initial_yaw_ = orientation[2];
 
         goal_ = Eigen::Vector3d({pos_[0], pos_[1], landing_height_});
     }

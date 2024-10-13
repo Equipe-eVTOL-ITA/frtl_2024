@@ -4,6 +4,7 @@
 #include "fase1/search_bases_state.hpp"
 #include "fase1/takeoff_state.hpp"
 #include "fase1/visit_bases_state.hpp"
+#include "fase1/camera_parameters.hpp"
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -18,6 +19,20 @@ public:
         //Drone* drone = blackboard_get<Drone>("drone");
 
         this->blackboard_set<float>("takeoff_height", -3.0);
+
+        this->blackboard_set<CameraParameters>("camera_parameters", CameraParameters());
+
+        //CameraParameters real_camera_params;
+        //real_camera_params.fx = ...; // Set from calibration data
+        //real_camera_params.fy = ...;
+        //real_camera_params.cx = ...;
+        //real_camera_params.cy = ...;
+        //real_camera_params.k1 = ...;
+        //real_camera_params.k2 = ...;
+        //real_camera_params.p1 = ...;
+        //real_camera_params.p2 = ...;
+        //real_camera_params.k3 = ...;
+       //this->blackboard_set<CameraParameters>("camera_parameters", real_camera_params);
 
         this->add_state("INITIAL TAKEOFF", std::make_unique<InitialTakeoffState>());
         this->add_state("SEARCH BASES", std::make_unique<SearchBasesState>());

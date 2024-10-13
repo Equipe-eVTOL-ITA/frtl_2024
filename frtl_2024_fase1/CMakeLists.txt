@@ -9,7 +9,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(fsm REQUIRED)
 find_package(frtl_2024_drone REQUIRED)
-#find_package(frtl_2024_cv_utils REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -27,7 +26,6 @@ ament_target_dependencies(fase1
   rclcpp
   fsm
   frtl_2024_drone
-  #frtl_2024_cv_utils
   Eigen3
   vision_msgs
 )
@@ -40,7 +38,6 @@ ament_target_dependencies(fase1_dummy
   rclcpp
   fsm
   frtl_2024_drone
-  #frtl_2024_cv_utils
   Eigen3
   vision_msgs
 )

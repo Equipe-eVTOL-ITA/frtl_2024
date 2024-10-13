@@ -25,7 +25,7 @@ public:
         }
 
         this->initial_z_ = pos[2];
-        this->initial_yaw_ = orientation[0];
+        this->initial_yaw_ = orientation[2];
         this->target_x_ = this->base_to_visit_->coordinates[0];
         this->target_y_ = this->base_to_visit_->coordinates[1];
 
