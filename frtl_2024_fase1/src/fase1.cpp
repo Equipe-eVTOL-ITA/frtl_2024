@@ -4,7 +4,7 @@
 #include "fase1/search_bases_state.hpp"
 #include "fase1/takeoff_state.hpp"
 #include "fase1/visit_bases_state.hpp"
-#include "fase1/camera_parameters.hpp"
+#include "fase1/CoordinateTransforms.hpp"
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -16,23 +16,44 @@ public:
     Fase1FSM() : fsm::FSM({"ERROR", "FINISHED"}) {
 
         this->blackboard_set<Drone>("drone", new Drone());
-        //Drone* drone = blackboard_get<Drone>("drone");
+        Drone* drone = blackboard_get<Drone>("drone");
 
-        this->blackboard_set<float>("takeoff_height", -3.0);
+        drone->setHomePosition();
+        Eigen::Vector3d home_pos = drone->getLocalPosition();
+        Eigen::Vector3d fictual_home = Eigen::Vector3d({2.2, 8.0, -0.6});
 
-        this->blackboard_set<CameraParameters>("camera_parameters", CameraParameters());
+        float takeoff_height = -3.0;
+        takeoff_height += home_pos[2] - fictual_home[2];
 
-        //CameraParameters real_camera_params;
-        //real_camera_params.fx = ...; // Set from calibration data
-        //real_camera_params.fy = ...;
-        //real_camera_params.cx = ...;
-        //real_camera_params.cy = ...;
-        //real_camera_params.k1 = ...;
-        //real_camera_params.k2 = ...;
-        //real_camera_params.p1 = ...;
-        //real_camera_params.p2 = ...;
-        //real_camera_params.k3 = ...;
-       //this->blackboard_set<CameraParameters>("camera_parameters", real_camera_params);
+        this->blackboard_set<float>("takeoff_height", takeoff_height);
+        blackboard_set<Eigen::Vector3d>("home_position", home_pos);
+
+        // COORDINATE TRANSFORMS
+        float fx = 640.0f;
+        float fy = 480.0f;
+        float cx = 320.0f;
+        float cy = 240.0f;
+        float k1 = 0.0f, k2 = 0.0f, k3 = 0.0f, p1 = 0.0f, p2 = 0.0f;
+        float ground_z = home_pos[2] + 0.6;
+
+        // Create camera intrinsic matrix K
+        cv::Mat camera_matrix = (cv::Mat_<double>(3, 3) <<
+            fx, 0, cx,
+            0, fy, cy,
+            0,  0,  1);
+
+        // Distortion coefficients
+        cv::Mat dist_coeffs = (cv::Mat_<double>(1, 5) <<
+            k1, k2, p1, p2, k3);
+
+        // Camera mounting parameters
+        Eigen::Vector3d t_dc(0, 0, 0.2);
+        Eigen::Matrix3d R_dc = Eigen::Matrix3d::Identity();
+
+        CoordinateTransforms* coord_transforms = new CoordinateTransforms(
+            t_dc, R_dc, camera_matrix, dist_coeffs, ground_z);
+
+        this->blackboard_set<CoordinateTransforms>("coordinate_transforms", coord_transforms);
 
         this->add_state("INITIAL TAKEOFF", std::make_unique<InitialTakeoffState>());
         this->add_state("SEARCH BASES", std::make_unique<SearchBasesState>());

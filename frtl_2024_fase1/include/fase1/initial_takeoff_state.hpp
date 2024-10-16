@@ -4,7 +4,7 @@
 
 #include <opencv2/highgui.hpp>
 
-#include "arena_point.hpp"
+#include "ArenaPoint.hpp"
 
 class InitialTakeoffState : public fsm::State {
 public:
@@ -17,20 +17,16 @@ public:
 
         drone->log("STATE: INITIAL TAKEOFF");
 
-        drone->setHomePosition();
         drone->toOffboardSync();
         drone->armSync();
         
         pos = drone->getLocalPosition();
         orientation = drone->getOrientation();
-
-        blackboard.set<Eigen::Vector3d>("home_position", pos);
         
         float target_height = *blackboard.get<float>("takeoff_height");
 
         drone->log("Home at: " + std::to_string(pos[0])
                     + " " + std::to_string(pos[1]) + " " + std::to_string(pos[2]));
-
 
         // ARENA POINTS
         std::vector<ArenaPoint> waypoints;
@@ -48,10 +44,8 @@ public:
         for (ArenaPoint& waypoint : waypoints){
             waypoint.coordinates = waypoint.coordinates - fictual_home + pos;
         }
-        target_height += pos[2] - fictual_home[2];
 
         blackboard.set<std::vector<ArenaPoint>>("waypoints", waypoints);
-        blackboard.set<float>("takeoff_height", target_height);
 
         goal = Eigen::Vector3d({pos[0], pos[1], target_height});
     }

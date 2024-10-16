@@ -4,8 +4,9 @@
 
 #include <iostream>
 #include <vector>
-#include "base.hpp"
-#include "get_next_point.hpp"
+#include "Base.hpp"
+#include "GetNextPoint.hpp"
+#include "CoordinateTransforms.hpp"
 
 class SearchBasesState : public fsm::State {
 public:
@@ -14,6 +15,8 @@ public:
     void on_enter(fsm::Blackboard &blackboard) override {
         drone = blackboard.get<Drone>("drone");
         if (drone == nullptr) return;
+
+        coord_transforms_ = blackboard.get<CoordinateTransforms>("coordinate_transforms");
 
         drone->log("STATE: SEARCH BASES");
 
@@ -40,6 +43,7 @@ public:
         (void)blackboard;
         
         pos = drone->getLocalPosition();
+        orientation = drone->getOrientation();
         goal_ptr = getNextPoint(waypoints_ptr);
 
         if (goal_ptr == nullptr)
@@ -69,20 +73,30 @@ public:
                                 + std::to_string(bbox.center_y) + ", " 
                                 + std::to_string(bbox.size_x) + ", " 
                                 + std::to_string(bbox.size_y) + "}");
+                    
+                    detected_pad_world_coords = coord_transforms_->ImageToWorld(
+                                                pos, orientation, bbox.center_x*640, bbox.center_y*480);
+                    
+                    drone->log("WORLD: {" + std::to_string(detected_pad_world_coords[0]) + ", " 
+                                + std::to_string(detected_pad_world_coords[1]) + ", " 
+                                + std::to_string(detected_pad_world_coords[2]) + "}");
                 }
             }
 
         }
         previous_bboxes = bboxes;
 
+        usleep(5e04);  // Control frequency to approximately 20Hz
+
         return ""; 
     }
     
 private:
+    CoordinateTransforms* coord_transforms_;
     std::vector<DronePX4::BoundingBox> bboxes, previous_bboxes;
-    const float max_velocity = 0.8;
+    const float max_velocity = 0.5;
     Drone* drone;
-    Eigen::Vector3d pos, orientation, goal, goal_diff;
+    Eigen::Vector3d pos, orientation, goal, goal_diff, detected_pad_world_coords;
     ArenaPoint* goal_ptr;
     std::vector<ArenaPoint>* waypoints_ptr;
 };

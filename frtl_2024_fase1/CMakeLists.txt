@@ -13,10 +13,14 @@ find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(OpenCV 4 REQUIRED)
-#find_package(nlohmann_json CONFIG REQUIRED)
 find_package(vision_msgs REQUIRED)
 
 include_directories(include)
+include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+
+add_library(CoordinateTransforms src/CoordinateTransforms.cpp)
 
 add_executable(fase1
   src/fase1.cpp
@@ -29,6 +33,8 @@ ament_target_dependencies(fase1
   Eigen3
   vision_msgs
 )
+
+target_link_libraries(fase1 CoordinateTransforms ${OpenCV_LIBS})
 
 add_executable(fase1_dummy
   src/fase1_dummy.cpp

@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from vision_msgs.msg import Detection2D, Detection2DArray, BoundingBox2D
 import cv2
@@ -13,7 +13,7 @@ class YoloClassifierNode(Node):
         super().__init__('yolo_classifier')
 
         # Declare parameters for the model name and image topic
-        self.declare_parameter('model', 'yolo_v3')
+        self.declare_parameter('model', 'yolo_v1')
         self.declare_parameter('image_topic', '/vertical_camera')
         
         # Get parameter values
@@ -48,7 +48,7 @@ class YoloClassifierNode(Node):
         image_topic = f'/{model_name}_image'
 
         self.classification_publisher_ = self.create_publisher(Detection2DArray, classification_topic, 10)
-        self.image_publisher_ = self.create_publisher(CompressedImage, image_topic, 10)
+        self.image_publisher_ = self.create_publisher(Image, image_topic, 10)
 
     def image_callback(self, msg):
         try:
@@ -100,7 +100,7 @@ class YoloClassifierNode(Node):
 
         # Convert the modified frame back to an Image message
         try:
-            annotated_msg = self.bridge.cv2_to_compressed_imgmsg(current_frame)
+            annotated_msg = self.bridge.cv2_to_imgmsg(current_frame, "bgr8")
             self.image_publisher_.publish(annotated_msg)
         except CvBridgeError as e:
             self.get_logger().error(f"Failed to convert annotated image: {str(e)}")
@@ -114,3 +114,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
