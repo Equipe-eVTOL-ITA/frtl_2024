@@ -5,6 +5,7 @@
 #include "fase1/takeoff_state.hpp"
 #include "fase1/visit_bases_state.hpp"
 #include "fase1/CoordinateTransforms.hpp"
+#include "fase1/Base.hpp"
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -18,15 +19,32 @@ public:
         this->blackboard_set<Drone>("drone", new Drone());
         Drone* drone = blackboard_get<Drone>("drone");
 
-        drone->setHomePosition();
         Eigen::Vector3d home_pos = drone->getLocalPosition();
         Eigen::Vector3d fictual_home = Eigen::Vector3d({2.2, 8.0, -0.6});
-
-        float takeoff_height = -3.0;
-        takeoff_height += home_pos[2] - fictual_home[2];
-
-        this->blackboard_set<float>("takeoff_height", takeoff_height);
         blackboard_set<Eigen::Vector3d>("home_position", home_pos);
+        drone->setHomePosition();
+
+        std::vector<Base> bases;
+        bases.push_back({home_pos, true});
+        this->blackboard_set<std::vector<Base>>("bases", bases);
+
+        // ARENA POINTS
+        std::vector<ArenaPoint> waypoints;
+        float takeoff_height = -3.0;
+        waypoints.push_back({Eigen::Vector3d({2.0, 8.0, takeoff_height})}); 
+        waypoints.push_back({Eigen::Vector3d({2.0, 2.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({4.0, 2.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({4.0, 8.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, 8.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, 2.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({8.0, 2.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({8.0, 8.0, takeoff_height})});
+        for (ArenaPoint& waypoint : waypoints){
+            waypoint.coordinates = waypoint.coordinates - fictual_home + home_pos;
+        }
+        this->blackboard_set<std::vector<ArenaPoint>>("waypoints", waypoints);
+        this->blackboard_set<float>("takeoff_height", waypoints[0].coordinates.z());
+
 
         // COORDINATE TRANSFORMS
         float fx = 640.0f;
@@ -36,7 +54,7 @@ public:
         float k1 = 0.0f, k2 = 0.0f, k3 = 0.0f, p1 = 0.0f, p2 = 0.0f;
         float ground_z = home_pos[2] + 0.6;
 
-        // Create camera intrinsic matrix K
+        // Camera intrinsic matrix K
         cv::Mat camera_matrix = (cv::Mat_<double>(3, 3) <<
             fx, 0, cx,
             0, fy, cy,

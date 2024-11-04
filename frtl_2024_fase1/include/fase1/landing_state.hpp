@@ -1,7 +1,6 @@
+#include <Eigen/Eigen>
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
-
 #include "Base.hpp"
 
 class LandingState : public fsm::State {
@@ -9,45 +8,50 @@ public:
     LandingState() : fsm::State() {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
-        drone_->log("STATE: LANDING");
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
+        drone->log("STATE: LANDING");
 
-        landing_height_ = *blackboard.get<float>("landing_height");
+        pos = drone->getLocalPosition();
 
-        pos_ = drone_->getLocalPosition();
-        Eigen::Vector3d orientation = drone_->getOrientation();
-        initial_yaw_ = orientation[2];
-
-        goal_ = Eigen::Vector3d({pos_[0], pos_[1], landing_height_});
+        for (int i = 0; i < 10; i++){
+            drone->land();
+            sleep(0.1);
+        }
+        sleep(2);
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
-        pos_ = drone_->getLocalPosition();
+        airspeed = drone->getAirSpeed();
 
-        if ((pos_-goal_).norm() < 0.10){
+        if (airspeed < 0.05){
             return "LANDED";
         }
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], this->initial_yaw_);
-        
         return "";
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
-        (void) blackboard;
 
-        //Descend for 3s at 0.4m/s to make sure it is landed
-        for (int i = 0 ;i < 30; i++){
-            drone_->setLocalVelocity(0.0, 0.0, 0.4);
+        //Descend for 1s at 0.4m/s to make sure it is landed
+        for (int i = 0 ;i < 10; i++){
+            drone->setLocalVelocity(0.0, 0.0, 0.4, 0.0);
             usleep(1e5);
         }
-        drone_->log("Landed at height: " + std::to_string(pos_[2]));
+
+        //Publish base coordinates
+        pos = drone->getLocalPosition();
+        std::vector<Base> bases = *blackboard.get<std::vector<Base>>("bases");
+        bases.push_back({pos, true});
+        blackboard.set<std::vector<Base>>("bases", bases);
+
+        drone->toOffboardSync();
+        drone->armSync();    
     }
 
 private:
-    Drone* drone_;
-    float landing_height_, initial_yaw_;
-    Eigen::Vector3d pos_, goal_;
+    float airspeed;
+    Drone* drone;
+    Eigen::Vector3d pos;
 };

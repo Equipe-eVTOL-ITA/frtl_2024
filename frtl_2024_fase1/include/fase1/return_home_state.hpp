@@ -1,6 +1,6 @@
+#include <Eigen/Eigen>
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
 
 class ReturnHomeState : public fsm::State {
 public:
