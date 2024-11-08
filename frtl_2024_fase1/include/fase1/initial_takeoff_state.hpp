@@ -32,6 +32,12 @@ public:
         
         pos  = drone->getLocalPosition();
 
+        if (i_%10==0){
+            drone->log("Pos: {" + std::to_string(pos[0]) + ", " 
+                        + std::to_string(pos[1]) + ", " + std::to_string(pos[2]) + "}");
+        }
+        i_++;
+
         if ((pos-goal).norm() < 0.15){
             return "INITIAL TAKEOFF COMPLETED";
         }
@@ -40,15 +46,15 @@ public:
         if (goal_diff.norm() > max_velocity){
             goal_diff = goal_diff.normalized() * max_velocity;
         }
-        goal = goal_diff + pos;
-        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
+        little_goal = goal_diff + pos;
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation[2]);
         
-        usleep(5e04);  // Control frequency to approximately 20Hz
         return "";
     }
 
 private:
     const float max_velocity = 1.0;
-    Eigen::Vector3d pos, orientation, goal, goal_diff;
+    Eigen::Vector3d pos, orientation, goal, goal_diff, little_goal;
     Drone* drone;
+    int i_ = 0;
 };

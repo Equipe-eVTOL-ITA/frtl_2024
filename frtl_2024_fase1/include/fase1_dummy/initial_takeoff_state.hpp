@@ -15,7 +15,6 @@ public:
 
         drone_->log("STATE: INITIAL TAKEOFF");
 
-        drone_->setHomePosition();
         drone_->toOffboardSync();
         drone_->arm();
         

@@ -19,32 +19,31 @@ public:
         this->blackboard_set<Drone>("drone", new Drone());
         Drone* drone = blackboard_get<Drone>("drone");
 
-        Eigen::Vector3d home_pos = drone->getLocalPosition();
-        Eigen::Vector3d fictual_home = Eigen::Vector3d({2.2, 8.0, -0.6});
-        blackboard_set<Eigen::Vector3d>("home_position", home_pos);
-        drone->setHomePosition();
+        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.2, -1.0, -0.6});
+        drone->setHomePosition(fictual_home);
 
         std::vector<Base> bases;
+        const Eigen::Vector3d home_pos = drone->getLocalPosition(); 
+        const Eigen::Vector3d orientation = drone->getOrientation();
+
         bases.push_back({home_pos, true});
         this->blackboard_set<std::vector<Base>>("bases", bases);
+        this->blackboard_set<Eigen::Vector3d>("home_position", home_pos);
+        this->blackboard_set<bool>("finished_bases", false);
 
         // ARENA POINTS
         std::vector<ArenaPoint> waypoints;
-        float takeoff_height = -3.0;
-        waypoints.push_back({Eigen::Vector3d({2.0, 8.0, takeoff_height})}); 
-        waypoints.push_back({Eigen::Vector3d({2.0, 2.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({4.0, 2.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({4.0, 8.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({6.0, 8.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({6.0, 2.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({8.0, 2.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({8.0, 8.0, takeoff_height})});
-        for (ArenaPoint& waypoint : waypoints){
-            waypoint.coordinates = waypoint.coordinates - fictual_home + home_pos;
-        }
+        float takeoff_height = -3.5;
+        waypoints.push_back({Eigen::Vector3d({1.0, -1.0, takeoff_height})}); 
+        waypoints.push_back({Eigen::Vector3d({1.0, -7.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({3.0, -7.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({3.0, -1.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({5.0, -1.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({5.0, -7.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({7.0, -7.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({7.0, -1.0, takeoff_height})});
         this->blackboard_set<std::vector<ArenaPoint>>("waypoints", waypoints);
-        this->blackboard_set<float>("takeoff_height", waypoints[0].coordinates.z());
-
+        this->blackboard_set<float>("takeoff_height", takeoff_height);
 
         // COORDINATE TRANSFORMS
         float fx = 640.0f;
@@ -52,7 +51,7 @@ public:
         float cx = 320.0f;
         float cy = 240.0f;
         float k1 = 0.0f, k2 = 0.0f, k3 = 0.0f, p1 = 0.0f, p2 = 0.0f;
-        float ground_z = home_pos[2] + 0.6;
+        float ground_z = -1.0;
 
         // Camera intrinsic matrix K
         cv::Mat camera_matrix = (cv::Mat_<double>(3, 3) <<
@@ -69,7 +68,7 @@ public:
         Eigen::Matrix3d R_dc = Eigen::Matrix3d::Identity();
 
         CoordinateTransforms* coord_transforms = new CoordinateTransforms(
-            t_dc, R_dc, camera_matrix, dist_coeffs, ground_z);
+            t_dc, R_dc, camera_matrix, dist_coeffs, ground_z, orientation[2]);
 
         this->blackboard_set<CoordinateTransforms>("coordinate_transforms", coord_transforms);
 
@@ -89,6 +88,7 @@ public:
 
         // Visit Base transitions
         this->add_transitions("VISIT BASE", {{"ARRIVED AT BASE", "LANDING"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("VISIT BASE", {{"LOST BASE", "SEARCH BASES"}, {"SEG FAULT", "ERROR"}});
 
         // Landing transitions
         this->add_transitions("LANDING", {{"LANDED", "TAKEOFF"},{"SEG FAULT", "ERROR"}});
@@ -105,23 +105,30 @@ public:
 
 class NodeFSM : public rclcpp::Node {
 public:
-    NodeFSM() : rclcpp::Node("fase1_node") {}
-    Fase1FSM my_fsm;
-};
-
-int main(int argc, const char * argv[]){
-    rclcpp::init(argc,argv);
-
-    auto my_node = std::make_shared<NodeFSM>();
-    while (rclcpp::ok() && !my_node->my_fsm.is_finished()) {
-        my_node->my_fsm.execute();
-        rclcpp::spin_some(my_node);
+    NodeFSM() : rclcpp::Node("fase1_node"), my_fsm() {
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(50),  // Run at approximately 20 Hz
+            std::bind(&NodeFSM::executeFSM, this));
     }
 
-    std::cout << my_node->my_fsm.get_fsm_outcome() << std::endl;
-    rclcpp::shutdown();
-    
+    void executeFSM() {
+        if (rclcpp::ok() && !my_fsm.is_finished()) {
+            my_fsm.execute();
+        } else {
+            rclcpp::shutdown();
+        }
+    }
+
+private:
+    Fase1FSM my_fsm;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, const char *argv[]) {
+    rclcpp::init(argc, argv);
+
+    auto my_node = std::make_shared<NodeFSM>();
+    rclcpp::spin(my_node);
+
     return 0;
 }
-
-

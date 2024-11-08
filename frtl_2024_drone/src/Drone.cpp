@@ -348,11 +348,9 @@ DronePX4::FAILURE Drone::getFailure() {
 
 
 Eigen::Vector3d Drone::getLocalPosition() {
-	return Eigen::Vector3d({
-		this->current_pos_x_,
-		this->current_pos_y_,
-		this->current_pos_z_
-	});
+	const Eigen::Vector3d posNED(this->current_pos_x_, this->current_pos_y_, this->current_pos_z_);
+	const Eigen::Vector3d posFRD = this->convertPositionNEDtoFRD(posNED); 
+	return posFRD;
 }
 
 
@@ -465,9 +463,12 @@ void Drone::setLocalPosition(float x, float y, float z, float yaw) {
 
 	msg.timestamp = this->px4_node_->get_clock()->now().nanoseconds() / 1000;
 
-	msg.position[0] = x;
-	msg.position[1] = y;
-	msg.position[2] = z;
+	const Eigen::Vector3d positionFRD(x, y, z);
+	const Eigen::Vector3d positionNED = this->convertPositionFRDtoNED(positionFRD);
+
+	msg.position[0] = positionNED.x();
+	msg.position[1] = positionNED.y();
+	msg.position[2] = positionNED.z();
 	msg.yaw = yaw;
 
 	// non-NaN velocity and acceleration fields are used as feedforward terms.
@@ -501,10 +502,11 @@ void Drone::setLocalPositionSync(
 
 		const Eigen::Vector3d currentPosition = getLocalPosition();
 		const Eigen::Vector3d goal = Eigen::Vector3d({x,y,z});
+
 		const auto distance = (currentPosition - goal).norm();
 
 		if (distance < distance_threshold) {
-		break;
+			break;
 		}
 
 		usleep(1e5);  // 100 ms
@@ -524,9 +526,11 @@ void Drone::setLocalVelocity(float vx, float vy, float vz, float yaw_rate) {
 	msg.position[2] = std::numeric_limits<float>::quiet_NaN();
 	msg.yaw = std::numeric_limits<float>::quiet_NaN();
 
-	msg.velocity[0] = vx;
-	msg.velocity[1] = vy;
-	msg.velocity[2] = vz;
+	const Eigen::Vector3d velocityFRD(vx, vy, vz);
+	const Eigen::Vector3d velocityNED = this->convertVelocityFRDtoNED(velocityFRD);
+	msg.velocity[0] = velocityNED.x();
+	msg.velocity[1] = velocityNED.y();
+	msg.velocity[2] = velocityNED.z();
 	msg.yawspeed = yaw_rate;
 
 	msg.acceleration[0] = std::numeric_limits<float>::quiet_NaN();
@@ -571,9 +575,9 @@ void Drone::setOffboardControlMode(DronePX4::CONTROLLER_TYPE type) {
 void Drone::toOffboardSync() {
 	for (int i = 0; i < 20; i++) {
 		setLocalPosition(
-			0.0,
-			0.0,
-			std::numeric_limits<float>::quiet_NaN(),
+			current_pos_x_,
+			current_pos_y_,
+			current_pos_z_,
 			std::numeric_limits<float>::quiet_NaN());
 		setOffboardControlMode(DronePX4::CONTROLLER_TYPE::POSITION);
 		usleep(1e5);  // 100 ms
@@ -612,7 +616,12 @@ void Drone::toPositionSync() {
 	}
 }
 
-void Drone::setHomePosition() {
+void Drone::setHomePosition(const Eigen::Vector3d& fictual_home) {
+	// Variables for Coordinate Systems transformations
+	this->frd_home_position_ = fictual_home;
+	this->ned_home_position_ = Eigen::Vector3d({current_pos_x_, current_pos_y_, current_pos_z_});
+	this->initial_yaw_ = yaw_;
+
 	this->sendCommand(
 		px4_msgs::msg::VehicleCommand::VEHICLE_CMD_DO_SET_HOME,
 		this->target_system_,
@@ -743,4 +752,58 @@ void Drone::resetHands() {
 	hand_location_x_ = 0.5;
 	hand_location_y_ = 0.5;
 	gestures_ = {"", ""};
+}
+
+
+//Coordinate System transformations (private functions)
+
+Eigen::Vector3d Drone::convertPositionNEDtoFRD(const Eigen::Vector3d& position_ned) const
+{
+    // Translate the NED coordinates to be relative to the NED home position
+    Eigen::Vector3d translated_position = position_ned - this->ned_home_position_;
+
+    // Apply rotation to account for the initial yaw
+    Eigen::Matrix3d rotation;
+    rotation << cos(-this->initial_yaw_), -sin(-this->initial_yaw_), 0,
+                sin(-this->initial_yaw_), cos(-this->initial_yaw_), 0,
+                0, 0, 1;
+
+    // Translate to be relative to the FRD home position
+    return rotation * translated_position + this->frd_home_position_;
+}
+
+Eigen::Vector3d Drone::convertPositionFRDtoNED(const Eigen::Vector3d& position_frd) const
+{
+    // Translate the FRD coordinates to be relative to the FRD home position
+    Eigen::Vector3d translated_position = position_frd - this->frd_home_position_;
+
+    // Apply inverse rotation to go from FRD to NED coordinates
+    Eigen::Matrix3d rotation;
+    rotation << cos(this->initial_yaw_), -sin(this->initial_yaw_), 0,
+                sin(this->initial_yaw_), cos(this->initial_yaw_), 0,
+                0, 0, 1;
+
+    return rotation * translated_position + this->ned_home_position_;
+}
+
+Eigen::Vector3d Drone::convertVelocityNEDtoFRD(const Eigen::Vector3d& velocity_ned) const
+{
+    // Apply rotation to account for the initial yaw
+    Eigen::Matrix3d rotation;
+    rotation << cos(-this->initial_yaw_), -sin(-this->initial_yaw_), 0,
+                sin(-this->initial_yaw_), cos(-this->initial_yaw_), 0,
+                0, 0, 1;
+
+    return rotation * velocity_ned;
+}
+
+Eigen::Vector3d Drone::convertVelocityFRDtoNED(const Eigen::Vector3d& velocity_frd) const
+{
+    // Apply inverse rotation to go from FRD to NED coordinates
+    Eigen::Matrix3d rotation;
+    rotation << cos(this->initial_yaw_), -sin(this->initial_yaw_), 0,
+                sin(this->initial_yaw_), cos(this->initial_yaw_), 0,
+                0, 0, 1;
+
+    return rotation * velocity_frd;
 }
