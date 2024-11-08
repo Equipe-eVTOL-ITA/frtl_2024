@@ -57,7 +57,7 @@ public:
                         float horizontal_distance = (approx_base - base.coordinates.head<2>()).norm();
                         drone->log("Dist " + std::to_string(horizontal_distance) + " to {" 
                                     + std::to_string(base.coordinates[0]) + ", " + std::to_string(base.coordinates[1]) + "}");
-                        if (horizontal_distance < 2.5) {
+                        if (horizontal_distance < 2.0) {
                             drone->log("Known base!");
                             is_known_base = true;
                             break;
