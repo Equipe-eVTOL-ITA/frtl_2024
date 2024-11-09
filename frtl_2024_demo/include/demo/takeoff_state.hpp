@@ -14,7 +14,7 @@ public:
         if (drone == nullptr) return;
         drone->log("Taking off");
         
-        drone->setHomePosition();
+        //drone->setHomePosition();
         drone->toOffboardSync();
         drone->arm();
         

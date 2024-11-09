@@ -1,12 +1,9 @@
-#include "fsm/fsm.hpp"
-#include "drone/Drone.hpp"
 #include <Eigen/Eigen>
-
 #include <iostream>
 #include <vector>
+#include "fsm/fsm.hpp"
+#include "drone/Drone.hpp"
 #include "Base.hpp"
-#include "GetNextPoint.hpp"
-#include "CoordinateTransforms.hpp"
 
 class SearchBasesState : public fsm::State {
 public:
@@ -15,36 +12,19 @@ public:
     void on_enter(fsm::Blackboard &blackboard) override {
         drone = blackboard.get<Drone>("drone");
         if (drone == nullptr) return;
-
-        coord_transforms_ = blackboard.get<CoordinateTransforms>("coordinate_transforms");
-
         drone->log("STATE: SEARCH BASES");
 
         orientation = drone->getOrientation();
 
-        waypoints_ptr = blackboard.get<std::vector<ArenaPoint>>("waypoints");
-
-        Eigen::Vector3d* last_search_ptr = blackboard.get<Eigen::Vector3d>("last search position");
-        if (last_search_ptr != nullptr){
-            drone->log("Going to last search position.");
-            Eigen::Vector3d& last_search = *last_search_ptr;
-            drone->setLocalPositionSync(last_search[0], last_search[1], last_search[2], orientation[2]);
-        }
-    }
-
-    void on_exit(fsm::Blackboard &blackboard) override {
-        pos = drone->getLocalPosition();
-        
-        blackboard.set<Eigen::Vector3d>("last search position", pos);
-        
+        waypoints = blackboard.get<std::vector<ArenaPoint>>("waypoints");
+        bases = blackboard.get<std::vector<Base>>("bases");
+        //Eigen::Vector3d* last_search_ptr = blackboard.get<Eigen::Vector3d>("last search position");
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
-        (void)blackboard;
         
         pos = drone->getLocalPosition();
-        orientation = drone->getOrientation();
-        goal_ptr = getNextPoint(waypoints_ptr);
+        goal_ptr = getNextPoint(waypoints);
 
         if (goal_ptr == nullptr)
             return "SEARCH ENDED";
@@ -56,47 +36,85 @@ public:
 
         goal = goal_ptr->coordinates;
         goal_diff = goal-pos;
-
         if (goal_diff.norm() > max_velocity){
             goal_diff = goal_diff.normalized() * max_velocity;
         }
-
         goal = goal_diff + pos;
-
         drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
+
         bboxes = drone->getBoundingBox();
 
         if (!bboxes.empty() && !previous_bboxes.empty()) {
             if (bboxes[0].center_x != previous_bboxes[0].center_x){
                 for (const auto& bbox : bboxes) {
-                    drone->log("BBOX: {" + std::to_string(bbox.center_x) + ", " 
-                                + std::to_string(bbox.center_y) + ", " 
-                                + std::to_string(bbox.size_x) + ", " 
-                                + std::to_string(bbox.size_y) + "}");
                     
-                    detected_pad_world_coords = coord_transforms_->ImageToWorld(
-                                                pos, orientation, bbox.center_x*640, bbox.center_y*480);
-                    
-                    drone->log("WORLD: {" + std::to_string(detected_pad_world_coords[0]) + ", " 
-                                + std::to_string(detected_pad_world_coords[1]) + ", " 
-                                + std::to_string(detected_pad_world_coords[2]) + "}");
+                    const Eigen::Vector2d offset = getApproximateBase(bbox.center_x, bbox.center_y);
+                    const Eigen::Vector2d approx_base = pos.head<2>() + offset;
+                    drone->log("Estimate: {" + std::to_string(approx_base.x()) + ", " + std::to_string(approx_base.y()) + "}");
+
+                    bool is_known_base = false;
+                    for (const auto& base : *bases) {
+                        float horizontal_distance = (approx_base - base.coordinates.head<2>()).norm();
+                        drone->log("Dist " + std::to_string(horizontal_distance) + " to {" 
+                                    + std::to_string(base.coordinates[0]) + ", " + std::to_string(base.coordinates[1]) + "}");
+                        if (horizontal_distance < 2.0) {
+                            drone->log("Known base!");
+                            is_known_base = true;
+                            break;
+                        }
+                    }
+
+                    if (!is_known_base) {
+                        blackboard.set<Eigen::Vector2d>("approximate_base", approx_base);
+                        return "BASES FOUND";
+                    }
                 }
             }
 
         }
         previous_bboxes = bboxes;
-
-        usleep(5e04);  // Control frequency to approximately 20Hz
-
         return ""; 
+    }
+
+    void on_exit(fsm::Blackboard &blackboard) override {
+        
+        pos = drone->getLocalPosition();
+        blackboard.set<Eigen::Vector3d>("last search position", pos);
     }
     
 private:
-    CoordinateTransforms* coord_transforms_;
-    std::vector<DronePX4::BoundingBox> bboxes, previous_bboxes;
-    const float max_velocity = 0.5;
     Drone* drone;
-    Eigen::Vector3d pos, orientation, goal, goal_diff, detected_pad_world_coords;
+    std::vector<Base>* bases;
+    std::vector<DronePX4::BoundingBox> bboxes, previous_bboxes;
+    std::vector<ArenaPoint>* waypoints;
     ArenaPoint* goal_ptr;
-    std::vector<ArenaPoint>* waypoints_ptr;
+    Eigen::Vector3d pos, orientation, goal, goal_diff;
+    const float max_velocity = 0.5;
+    
+    Eigen::Vector2d getApproximateBase(double x, double y) {
+        double x_max_dist = 3.5; //distance on ground from left to right of picture when flying at takeoff altitude
+        double y_max_dist = x_max_dist * 3 / 4; //based on 4:3 image proportion - from up to down
+
+        double avg_hgt = 3.0; // Averaged distance to landing pad
+
+        //Considering that pixel dimensions are like angular resolution
+        double k_x = std::atan((x_max_dist / 2) / avg_hgt);
+        double k_y = std::atan((y_max_dist / 2) / avg_hgt);
+
+        double distance_x = avg_hgt * std::tan(k_x * 2 * (x-0.5));
+        double distance_y = - avg_hgt * std::tan(k_y * 2 * (y-0.5)); //Minus sign comes from yolo assuming 1 is on top of image
+        
+        return Eigen::Vector2d({distance_y, distance_x});
+    }
+
+    ArenaPoint* getNextPoint(std::vector<ArenaPoint>* waypoints) {
+        for (auto& point : *waypoints) {
+            if (!point.is_visited) {
+                return &point;
+            }
+        }
+        
+        // Return nullptr if no unvisited points are found
+        return nullptr;
+    }
 };

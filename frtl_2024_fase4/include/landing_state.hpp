@@ -47,5 +47,5 @@ public:
 private:
     float airspeed;
     Drone* drone;
-    Eigen::Vector3d pos, goal;
+    Eigen::Vector3d pos;
 };

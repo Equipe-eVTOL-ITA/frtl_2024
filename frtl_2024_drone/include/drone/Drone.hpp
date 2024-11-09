@@ -28,6 +28,7 @@
 #include <px4_msgs/msg/airspeed.hpp>
 
 #include <Eigen/Eigen>
+#include <Eigen/Dense>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core.hpp>
 
@@ -175,7 +176,7 @@ public:
 
 	void toPositionSync();
 
-	void setHomePosition();
+	void setHomePosition(const Eigen::Vector3d& fictual_home);
 	
 	void setOffboardMode();
 
@@ -300,6 +301,15 @@ private:
 	float roll_{0};
 	float pitch_{0};
 	float yaw_{0};
+
+	Eigen::Vector3d frd_home_position_;
+	Eigen::Vector3d ned_home_position_;
+	float initial_yaw_{0};
+
+    Eigen::Vector3d convertPositionNEDtoFRD(const Eigen::Vector3d& position_ned) const;
+    Eigen::Vector3d convertPositionFRDtoNED(const Eigen::Vector3d& position_frd) const;
+    Eigen::Vector3d convertVelocityNEDtoFRD(const Eigen::Vector3d& velocity_ned) const;
+    Eigen::Vector3d convertVelocityFRDtoNED(const Eigen::Vector3d& velocity_frd) const;
 
 	std::vector<DronePX4::BoundingBox> detections_{};
 	float bbox_center_x_{0.0};

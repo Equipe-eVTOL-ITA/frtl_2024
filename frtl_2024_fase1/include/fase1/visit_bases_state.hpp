@@ -1,69 +1,133 @@
+#include <Eigen/Eigen>
+#include <vector>
+#include <limits>
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
 #include "Base.hpp"
+#include "PidController.hpp"
+
+#include <deque>
+#include <iostream>
+#include <string>
+#include <array>
 
 class VisitBasesState : public fsm::State {
 public:
-    VisitBasesState() : fsm::State() {}
+    VisitBasesState() : fsm::State(), x_pid(0.9, 0.0, 0.05, 0.5), y_pid(0.9, 0.0, 0.05, 0.5)  {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
+        
+        drone = blackboard.get<Drone>("drone");
+        drone->log("STATE: VISIT BASES");
 
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
-        drone_->log("STATE: VISIT BASES");
-    
-        Eigen::Vector3d pos = drone_->getLocalPosition(),
-                        orientation = drone_->getOrientation();
+        orientation = drone->getOrientation();
+        float takeoff_height = *blackboard.get<float>("takeoff_height");
+        const Eigen::Vector2d approx_base = *blackboard.get<Eigen::Vector2d>("approximate_base");
 
-        bases = blackboard.get<std::vector<Base>>("bases");
-        for (Base& base : *bases){
-            if (!base.is_visited){
-                this->base_to_visit_ = &base;
-                break;
-            }
-        }
-
-        this->initial_z_ = pos[2];
-        this->initial_yaw_ = orientation[2];
-        this->target_x_ = this->base_to_visit_->coordinates[0];
-        this->target_y_ = this->base_to_visit_->coordinates[1];
-
-        drone_->log("Visiting base at: " + std::to_string(this->target_x_) + " " + std::to_string(this->target_y_)); 
+        approx_goal = Eigen::Vector3d(approx_base.x(), approx_base.y(), takeoff_height);
+        
+        drone->log("Estimate: {" + std::to_string(approx_base.x()) + ", " + std::to_string(approx_base.y()) + "}");
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
 
-        Eigen::Vector3d pos  = drone_->getLocalPosition(),
-                        goal = Eigen::Vector3d({this->target_x_, this->target_y_, this->initial_z_});
+        if (!at_approximate_base){
+            pos = drone->getLocalPosition();
 
-        if ((pos-goal).norm() < 0.10)
+            if ((approx_goal - pos).norm() < 0.10){
+                drone->log("Arrived at estimated base.");
+                at_approximate_base = true;
+            }
+
+            Eigen::Vector3d goal_diff = approx_goal - pos;
+            if (goal_diff.norm() > max_velocity){
+                goal_diff = goal_diff.normalized() * max_velocity;
+            }
+            little_goal = goal_diff + pos;
+
+            drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation[2]);
+
+            return "";
+        }
+
+        bboxes = drone->getBoundingBox();
+
+        // Find the bounding box closest to the center
+        double min_distance = std::numeric_limits<double>::max();
+        if (!bboxes.empty()) {
+            updateBBoxesBuffer(bboxes[0].center_x);
+            for (const auto &bbox : bboxes) {
+                double distance = (Eigen::Vector2d(bbox.center_x, bbox.center_y) - image_center).norm();
+                if (distance < min_distance) {
+                    min_distance = distance;
+                    closest_bbox = bbox;
+                }
+            }
+        }
+        else{
+            drone->setLocalVelocity(0.0, 0.0, 0.0, 0.0);
+            updateBBoxesBuffer(0.0);
+            return "";
+        }
+
+        //BBox detection is the same for the last 5s
+        if (allElementsEqual(bboxes_buffer))
+        {
+            drone->log("Last 5s had no detections!");
+            return "LOST BASE";
+        }
+        //Good to do PID Control
+        else
+        {
+            x_rate = x_pid.compute(closest_bbox.center_y);
+            y_rate = y_pid.compute(closest_bbox.center_x);
+            drone->setLocalVelocity(x_rate, -y_rate, 0.0);
+        }
+
+        if (min_distance < 0.03){
             return "ARRIVED AT BASE";
+        }
 
-        drone_->setLocalPosition(goal[0], goal[1], goal[2], this->initial_yaw_);
-        
         return "";
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
-
-        blackboard.set<float>("landing_height", this->base_to_visit_->coordinates[2]);
-        this->base_to_visit_->is_visited = true;
-
-        bool finished_bases = true;
-        for (Base& base : *bases){
-            if (!base.is_visited){
-                finished_bases = false;
-                break;
-            }
-        }
-        blackboard.set<bool>("finished_bases", finished_bases);
+        (void) blackboard;
+        bboxes_buffer.clear();
+        at_approximate_base = false;
     }
 
 private:
-    std::vector<Base>* bases;
-    Drone* drone_;
-    Base* base_to_visit_;
-    float initial_z_, initial_yaw_, target_x_, target_y_;
+    Eigen::Vector2d image_center = Eigen::Vector2d({0.5, 0.5});
+    Drone* drone;
+    PidController x_pid, y_pid;
+    float x_rate = 0.0, y_rate = 0.0;
+    std::vector<DronePX4::BoundingBox> bboxes;
+    DronePX4::BoundingBox closest_bbox;
+    std::deque<float> bboxes_buffer;
+    bool at_approximate_base = false;
+    Eigen::Vector3d pos, orientation, approx_goal, little_goal;
+    float max_velocity = 1.0;
+
+    void updateBBoxesBuffer(float new_center_x)
+    {
+        if (bboxes_buffer.size() >= 100){
+            bboxes_buffer.pop_front();
+        }
+        bboxes_buffer.push_back(new_center_x);
+    }
+
+    bool allElementsEqual(const std::deque<float>& buffer)
+    {
+        if (buffer.empty()) return true;
+        float first_value = buffer[0];
+        for (const auto& value : buffer){
+            if (value != first_value) {
+                return false;
+            }
+        }
+        return buffer.size() == 100; // 5 seconds
+    }
+
 };
