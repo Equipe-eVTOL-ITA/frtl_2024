@@ -45,7 +45,7 @@ class YoloClassifierNode(Node):
 
         # Set dynamic topic names based on the model name
         classification_topic = '/vertical_classification'
-        image_topic = f'/{model_name}_image'
+        image_topic = f'/{model_name}/image/compressed'
 
         self.classification_publisher_ = self.create_publisher(Detection2DArray, classification_topic, 10)
         self.image_publisher_ = self.create_publisher(CompressedImage, image_topic, 10)
@@ -100,7 +100,8 @@ class YoloClassifierNode(Node):
 
         # Convert the modified frame back to an Image message
         try:
-            annotated_msg = self.bridge.cv2_to_compressed_imgmsg(current_frame, "jpeg")
+            annotated_msg = self.bridge.cv2_to_compressed_imgmsg(current_frame)
+            self.get_logger().info("Publishing annotated image.")
             self.image_publisher_.publish(annotated_msg)
         except CvBridgeError as e:
             self.get_logger().error(f"Failed to convert annotated image: {str(e)}")
