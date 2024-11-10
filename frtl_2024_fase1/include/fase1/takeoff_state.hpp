@@ -44,7 +44,7 @@ public:
 
         little_goal = goal_diff + pos_;
 
-        drone_->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation_[2]);
+        drone_->setLocalPosition(goal_[0], goal_[1], little_goal[2], orientation_[2]);
         
         return "";
     }

@@ -30,12 +30,13 @@ class YoloClassifierNode(Node):
         self.model = YOLO(self.model_path)
 
         qos_profile = QoSProfile(
-        depth=10,
-        reliability=ReliabilityPolicy.BEST_EFFORT
+            depth=10,
+            reliability=ReliabilityPolicy.BEST_EFFORT
         )
 
-        # Setup subscriber and publisher
+        # Setup subscriber, publisher, and timer
         self.bridge = CvBridge()
+        self.latest_image_msg = None  # To store the latest image message
         self.subscriber = self.create_subscription(
             CompressedImage,
             self.image_topic,
@@ -50,10 +51,21 @@ class YoloClassifierNode(Node):
         self.classification_publisher_ = self.create_publisher(Detection2DArray, classification_topic, 10)
         self.image_publisher_ = self.create_publisher(CompressedImage, image_topic, 10)
 
+        # Set up a 10 Hz timer for processing images
+        self.timer = self.create_timer(0.1, self.process_image_callback)
+
     def image_callback(self, msg):
+        # Store the latest image message
+        self.latest_image_msg = msg
+
+    def process_image_callback(self):
+        # Only process if a new image has been received
+        if self.latest_image_msg is None:
+            return
+
         try:
             # Convert ROS Image message to OpenCV image
-            current_frame = self.bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
+            current_frame = self.bridge.compressed_imgmsg_to_cv2(self.latest_image_msg, "bgr8")
         except CvBridgeError as e:
             self.get_logger().error(f"Failed to convert image: {str(e)}")
             return
@@ -78,11 +90,10 @@ class YoloClassifierNode(Node):
                 detection.bbox.center.position.y = float(y_center)
                 detection.bbox.size_x = float(width)
                 detection.bbox.size_y = float(height)
-                #detection.results.append({'score': box.conf[0], 'id': box.id})  # Adjust as needed
-                if (box.conf[0] > 0.3):
+                if box.conf[0] > 0.3:
                     detections.detections.append(detection)
 
-                # ANOTTATED IMAGES
+                # ANNOTATED IMAGES
                 x1, y1, x2, y2 = box.xyxy[0]
                 confidence = box.conf[0]
 
@@ -115,4 +126,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
