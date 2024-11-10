@@ -1,53 +1,60 @@
+#include <Eigen/Eigen>
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
-
-#include "base.hpp"
+#include "Base.hpp"
+#include <chrono>
 
 class LandingState : public fsm::State {
 public:
     LandingState() : fsm::State() {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
-        drone_->log("STATE: LANDING");
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
+        drone->log("STATE: LANDING");
 
-        landing_height_ = *blackboard.get<float>("landing_height");
+        pos = drone->getLocalPosition();
 
-        pos_ = drone_->getLocalPosition();
-        Eigen::Vector3d orientation = drone_->getOrientation();
-        initial_yaw_ = orientation[0];
+        start_time_ = std::chrono::steady_clock::now();
 
-        goal_ = Eigen::Vector3d({pos_[0], pos_[1], landing_height_});
+        drone->log("Descending for 8s.");
     }
-
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
-        pos_ = drone_->getLocalPosition();
+        
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time_).count();
 
-        if ((pos_-goal_).norm() < 0.10){
+        if (elapsed_time > 8) {
             return "LANDED";
         }
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], this->initial_yaw_);
-        
+        drone->setLocalVelocity(0.0, 0.0, 0.5, 0.0);
         return "";
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
-        (void) blackboard;
+        //Publish base coordinates
+        pos = drone->getLocalPosition();
+        std::vector<Base> bases = *blackboard.get<std::vector<Base>>("bases");
+        bases.push_back({pos, true});
+        blackboard.set<std::vector<Base>>("bases", bases);
 
-        //Descend for 3s at 0.4m/s to make sure it is landed
-        for (int i = 0 ;i < 30; i++){
-            drone_->setLocalVelocity(0.0, 0.0, 0.4);
-            usleep(1e5);
+        drone->log("New base {" + std::to_string(bases.size()) + "}: " +
+                    std::to_string(pos.x()) + ", " + std::to_string(pos.y()) + ", " + std::to_string(pos.z()));
+
+        if (bases.size() > 5){
+            blackboard.set<bool>("finished_bases", true);
+            drone->log("Visited all 6 bases");
         }
-        drone_->log("Landed at height: " + std::to_string(pos_[2]));
+
+        drone->log("Offboard and arming.");
+        drone->toOffboardSync();
+        drone->armSync();    
     }
 
 private:
-    Drone* drone_;
-    float landing_height_, initial_yaw_;
-    Eigen::Vector3d pos_, goal_;
+    Drone* drone;
+    Eigen::Vector3d pos;
+    std::chrono::steady_clock::time_point start_time_;
 };

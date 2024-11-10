@@ -11,7 +11,7 @@ frtl_2024_cv_utils/              # Top-level ROS 2 package directory
 |
 ├── launch/                      # Directory for launch files
 │   └── my_launch_file.launch.py
-├── python_modules/          # Python module directory
+├── yolo_classifier/          # Python module directory for yolo classifier
 │   ├── __init__.py
 │   ├── yolo_classifier_node.py  # Main node script
 │   ├── utils.py                 # Utility functions

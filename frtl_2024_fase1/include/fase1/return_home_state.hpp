@@ -1,6 +1,7 @@
+#include <Eigen/Eigen>
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
+#include <chrono>
 
 class ReturnHomeState : public fsm::State {
 public:
@@ -15,19 +16,19 @@ public:
         pos_ = drone_->getLocalPosition();
         orientation_ = drone_->getOrientation();
 
-        goal_ = Eigen::Vector3d({home_pos_[0], home_pos_[1], pos_[2]});
+        goal_ = Eigen::Vector3d({home_pos_.x(), home_pos_.y(), pos_.z()});
         
         drone_->log("Going to home at: " + std::to_string(goal_[0]) + " " + std::to_string(goal_[1]));
+
+        start_time_ = std::chrono::steady_clock::now();
     }
 
     void on_exit(fsm::Blackboard &blackboard) override {
         (void)blackboard;
-
-        goal_[2] = home_pos_[2];
-        drone_->setLocalPositionSync(goal_[0], goal_[1], goal_[2], orientation_[0]);
         
         drone_->log("At home, now entered Land Mode for precaution.");
         drone_->land();
+        rclcpp::sleep_for(std::chrono::seconds(5));
         drone_->disarmSync();
     }
 
@@ -35,16 +36,48 @@ public:
         (void)blackboard;
 
         pos_ = drone_->getLocalPosition();
-        
-        if ((pos_-goal_).norm() < 0.10)
-            return "AT HOME";
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[0]);
-        
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time_).count();
+
+        if (elapsed_time > 15) {
+            return "AT HOME";
+        }
+
+        if (!over_base_){
+            if ((pos_-goal_).norm() < 0.10){
+                over_base_ = true;
+            }
+
+            goal_diff = goal_ - pos_;
+            if (goal_diff.norm() > max_velocity){
+                goal_diff = goal_diff.normalized() * max_velocity;
+            }
+            little_goal_ = goal_diff + pos_;
+            
+            drone_->setLocalPosition(little_goal_[0], little_goal_[1], pos_[2], orientation_[2]);
+        }
+        else
+        {
+            if ((pos_ - home_pos_).norm() < 0.10){
+                return "AT HOME";
+            }
+
+            goal_diff = home_pos_ - pos_;
+            if (goal_diff.norm() > max_velocity){
+                goal_diff = goal_diff.normalized() * max_velocity;
+            }
+            little_goal_ = goal_diff + pos_;
+            drone_->setLocalPosition(little_goal_[0], little_goal_[1], little_goal_[2] - 0.05, orientation_[2]);
+        }
+
         return "";
     }
 
 private:
-    Eigen::Vector3d home_pos_, pos_, orientation_, goal_;
+    bool over_base_ = false;
+    Eigen::Vector3d home_pos_, pos_, orientation_, home_horizon_, goal_, goal_diff, little_goal_;
     Drone* drone_;
+    const float max_velocity = 1.0;
+    std::chrono::steady_clock::time_point start_time_; 
 };
