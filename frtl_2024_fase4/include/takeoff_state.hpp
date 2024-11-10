@@ -29,13 +29,20 @@ public:
         if ((pos-goal).norm() < 0.15)
             return "TAKEOFF COMPLETED";
 
-        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
+        goal_diff = goal - pos;
+        if (goal_diff.norm() > max_velocity){
+            goal_diff = goal_diff.normalized() * max_velocity;
+        }
+
+        little_goal = goal_diff + pos;
+
+        drone->setLocalPosition(goal[0], goal[1], little_goal[2], orientation[2]);
         
-        usleep(5e04); // Throttle to approx 20 Hz
         return "";
     }
 
 private:
-    Eigen::Vector3d pos, orientation, goal;
+    float max_velocity = 1.5;
+    Eigen::Vector3d pos, orientation, goal, goal_diff, little_goal;
     Drone* drone;
 };

@@ -45,7 +45,6 @@ public:
         drone->setLocalVelocity(0.0, 0.0, 0.0, 
                                 clockwise ? yaw_speed : -yaw_speed);
 
-        usleep(5e04);
         return "";
     }
     

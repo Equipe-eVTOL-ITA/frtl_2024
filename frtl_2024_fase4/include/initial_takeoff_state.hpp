@@ -18,11 +18,8 @@ public:
         
         pos = drone->getLocalPosition();
         orientation = drone->getOrientation();
-
-        blackboard.set<Eigen::Vector3d>("home position", pos);
         
         float* takeoff_height = blackboard.get<float>("takeoff height");
-        *takeoff_height += pos[2];
 
         drone->log("Home at: " + std::to_string(pos[0])
                     + " " + std::to_string(pos[1]) + " " + std::to_string(pos[2]));
@@ -36,17 +33,29 @@ public:
         
         pos  = drone->getLocalPosition();
 
-        if ((pos-goal).norm() < 0.10)
+        if (i_%10==0){
+            drone->log("Pos: {" + std::to_string(pos[0]) + ", " 
+                        + std::to_string(pos[1]) + ", " + std::to_string(pos[2]) + "}");
+        }
+        i_++;
+
+        if ((pos-goal).norm() < 0.15){
             return "INITIAL TAKEOFF COMPLETED";
+        }
 
-        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
-
-        usleep(5e04); // Throttle to approx 20 Hz
+        goal_diff = goal-pos;
+        if (goal_diff.norm() > max_velocity){
+            goal_diff = goal_diff.normalized() * max_velocity;
+        }
+        little_goal = goal_diff + pos;
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation[2]);
         
         return "";
     }
 
 private:
-    Eigen::Vector3d pos, orientation, goal;
+    const float max_velocity = 1.0;
+    Eigen::Vector3d pos, orientation, goal, goal_diff, little_goal;
     Drone* drone;
+    int i_ = 0;
 };

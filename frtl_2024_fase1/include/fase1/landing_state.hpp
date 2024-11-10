@@ -17,7 +17,7 @@ public:
 
         start_time_ = std::chrono::steady_clock::now();
 
-        drone->log("Descending for 10s.");
+        drone->log("Descending for 8s.");
     }
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;

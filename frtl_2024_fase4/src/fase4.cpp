@@ -10,15 +10,22 @@
 #include <iostream>
 
 
-class Fase1FSM : public fsm::FSM {
+class Fase4FSM : public fsm::FSM {
 public:
-    Fase1FSM() : fsm::FSM({"ERROR", "FINISHED"}) {
+    Fase4FSM() : fsm::FSM({"ERROR", "FINISHED"}) {
 
         this->blackboard_set<Drone>("drone", new Drone());
+        Drone* drone = blackboard_get<Drone>("drone");
+
+        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.2, -1.0, -0.6});
+        drone->setHomePosition(fictual_home);
+
+        const Eigen::Vector3d home_pos = drone->getLocalPosition();
+        this->blackboard_set<Eigen::Vector3d>("home_position", home_pos);
 
         this->blackboard_set<float>("takeoff height", -1.6);
-        this->blackboard_set<float>("control speed", 0.5);
-        this->blackboard_set<float>("yaw speed", 0.3);
+        this->blackboard_set<float>("control speed", 0.4);
+        this->blackboard_set<float>("yaw speed", 0.4);
 
 
         this->add_state("INITIAL TAKEOFF", std::make_unique<InitialTakeoffState>());
@@ -52,22 +59,31 @@ public:
 
 class NodeFSM : public rclcpp::Node {
 public:
-    NodeFSM() : rclcpp::Node("fase4_node") {}
-    Fase1FSM my_fsm;
-};
-
-int main(int argc, const char * argv[]){
-    rclcpp::init(argc,argv);
-
-    auto my_node = std::make_shared<NodeFSM>();
-    while (rclcpp::ok() && !my_node->my_fsm.is_finished()) {
-        my_node->my_fsm.execute();
-        rclcpp::spin_some(my_node);
+    NodeFSM() : rclcpp::Node("fase4_node"), my_fsm() {
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(50),  // Run at approximately 20 Hz
+            std::bind(&NodeFSM::executeFSM, this));
     }
 
-    std::cout << my_node->my_fsm.get_fsm_outcome() << std::endl;
-    rclcpp::shutdown();
-    
+    void executeFSM() {
+        if (rclcpp::ok() && !my_fsm.is_finished()) {
+            my_fsm.execute();
+        } else {
+            rclcpp::shutdown();
+        }
+    }
+
+private:
+    Fase4FSM my_fsm;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, const char *argv[]) {
+    rclcpp::init(argc, argv);
+
+    auto my_node = std::make_shared<NodeFSM>();
+    rclcpp::spin(my_node);
+
     return 0;
 }
 
