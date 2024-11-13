@@ -30,18 +30,18 @@ public:
         this->blackboard_set<std::vector<Base>>("bases", bases);
         this->blackboard_set<Eigen::Vector3d>("home_position", home_pos);
         this->blackboard_set<bool>("finished_bases", false);
+        this->blackboard_set<float>("initial_yaw", orientation[2]);
 
         // ARENA POINTS
         std::vector<ArenaPoint> waypoints;
-        float takeoff_height = -3.5;
-        waypoints.push_back({Eigen::Vector3d({1.0, -1.0, takeoff_height})}); 
+        float takeoff_height = -3.0;
         waypoints.push_back({Eigen::Vector3d({1.0, -7.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({3.0, -7.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({3.0, -1.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({5.0, -1.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({5.0, -7.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({7.0, -7.0, takeoff_height})});
-        waypoints.push_back({Eigen::Vector3d({7.0, -1.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, -7.0, takeoff_height})});
+        waypoints.push_back({Eigen::Vector3d({6.0, -1.0, takeoff_height})});
         this->blackboard_set<std::vector<ArenaPoint>>("waypoints", waypoints);
         this->blackboard_set<float>("takeoff_height", takeoff_height);
 

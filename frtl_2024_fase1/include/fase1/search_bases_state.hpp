@@ -14,8 +14,7 @@ public:
         if (drone == nullptr) return;
         drone->log("STATE: SEARCH BASES");
 
-        orientation = drone->getOrientation();
-
+        initial_yaw = *blackboard.get<float>("initial_yaw");
         waypoints = blackboard.get<std::vector<ArenaPoint>>("waypoints");
         bases = blackboard.get<std::vector<Base>>("bases");
         //Eigen::Vector3d* last_search_ptr = blackboard.get<Eigen::Vector3d>("last search position");
@@ -40,7 +39,7 @@ public:
             goal_diff = goal_diff.normalized() * max_velocity;
         }
         goal = goal_diff + pos;
-        drone->setLocalPosition(goal[0], goal[1], goal[2], orientation[2]);
+        drone->setLocalPosition(goal[0], goal[1], goal[2], initial_yaw);
 
         bboxes = drone->getBoundingBox();
 
@@ -57,7 +56,7 @@ public:
                         float horizontal_distance = (approx_base - base.coordinates.head<2>()).norm();
                         drone->log("Dist " + std::to_string(horizontal_distance) + " to {" 
                                     + std::to_string(base.coordinates[0]) + ", " + std::to_string(base.coordinates[1]) + "}");
-                        if (horizontal_distance < 2.0) {
+                        if (horizontal_distance < 1.7) {
                             drone->log("Known base!");
                             is_known_base = true;
                             break;
@@ -88,14 +87,15 @@ private:
     std::vector<DronePX4::BoundingBox> bboxes, previous_bboxes;
     std::vector<ArenaPoint>* waypoints;
     ArenaPoint* goal_ptr;
-    Eigen::Vector3d pos, orientation, goal, goal_diff;
+    Eigen::Vector3d pos, goal, goal_diff;
     const float max_velocity = 0.4;
+    float initial_yaw;
     
     Eigen::Vector2d getApproximateBase(double x, double y) {
-        double x_max_dist = 3.5; //distance on ground from left to right of picture when flying at takeoff altitude
+        double x_max_dist = 2.3; //distance on ground from left to right of picture when flying at takeoff altitude
         double y_max_dist = x_max_dist * 3 / 4; //based on 4:3 image proportion - from up to down
 
-        double avg_hgt = 3.0; // Averaged distance to landing pad
+        double avg_hgt = 2.5; // Averaged distance to landing pad
 
         //Considering that pixel dimensions are like angular resolution
         double k_x = std::atan((x_max_dist / 2) / avg_hgt);
