@@ -89,7 +89,7 @@ private:
     std::vector<ArenaPoint>* waypoints;
     ArenaPoint* goal_ptr;
     Eigen::Vector3d pos, orientation, goal, goal_diff;
-    const float max_velocity = 0.5;
+    const float max_velocity = 0.4;
     
     Eigen::Vector2d getApproximateBase(double x, double y) {
         double x_max_dist = 3.5; //distance on ground from left to right of picture when flying at takeoff altitude
