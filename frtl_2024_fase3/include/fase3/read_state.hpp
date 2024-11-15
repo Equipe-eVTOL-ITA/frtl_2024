@@ -6,10 +6,8 @@
 #include "Base.hpp"
 #include "PidController.hpp"
 
-#include <deque>
 #include <iostream>
 #include <string>
-#include <array>
 
 class ReadState : public fsm::State {
 public:
@@ -18,24 +16,35 @@ public:
     void on_enter(fsm::Blackboard &blackboard) override {
         
         drone = blackboard.get<Drone>("drone");
-        drone->log("STATE: CENTALIZE BASE");
+        drone->log("STATE: READ BASE");
 
         // min height = 60cm above base height
         Base current_base = *blackboard.get<Base>("current_base");
         float takeoff_height = *blackboard.get<float>("takeoff_height");
-        min_height = current_base.coordinates[2] - takeoff_height - 0.5;
+        min_height = current_base.coordinates[2] - takeoff_height - 0.45;
 
         pos = drone->getLocalPosition();
 
         goal = Eigen::Vector3d({pos[0], pos[1], min_height});
+        drone->log("Terminal position: {" + std::to_string(goal[0]) + ", " + std::to_string(goal[1]) + ", " + std::to_string(goal[2]) + "}");
+
+        start_time_ = std::chrono::steady_clock::now();
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
 
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time_).count();
+        if (elapsed_time > 5) {
+            drone->log("Exceeded 5s with no detections");
+            return "GOT QR CODE";
+        }
+
         pos = drone->getLocalPosition();
         if (pos[2] >= min_height){
-            return "QR CODE";
+            drone->log("Reached terminal height.");
+            return "GOT QR CODE";
         }
 
         std::string qrcode = drone->readQRCode();
@@ -48,8 +57,8 @@ public:
 
         // Find the bounding box closest to the center
         double min_distance = std::numeric_limits<double>::max();
-        if (!bboxes.empty()) {
-            updateBBoxesBuffer(bboxes[0].center_x);
+        if (!bboxes.empty() && bboxes[0].center_x != 0.0) {
+            start_time_ = std::chrono::steady_clock::now();
             for (const auto &bbox : bboxes) {
                 double distance = (Eigen::Vector2d(bbox.center_x, bbox.center_y) - image_center).norm();
                 if (distance < min_distance) {
@@ -57,25 +66,13 @@ public:
                     closest_bbox = bbox;
                 }
             }
-        }
-        else{
-            drone->setLocalVelocity(0.0, 0.0, 0.10, 0.0);
-            updateBBoxesBuffer(0.0);
-            return "";
-        }
-
-        //BBox detection is the same for the last 5s
-        if (allElementsEqual(bboxes_buffer))
-        {
-            drone->log("Last 5s had no detections!");
-            return "LOST BASE";
-        }
-        //Good to do PID Control
-        else
-        {
             x_rate = x_pid.compute(closest_bbox.center_y);
             y_rate = y_pid.compute(closest_bbox.center_x);
             drone->setLocalVelocity(x_rate, -y_rate, 0.15, 0.0);
+        }
+        else{
+            drone->setLocalVelocity(0.0, 0.0, 0.15, 0.0);
+            return "";
         }
 
         return "";
@@ -86,14 +83,12 @@ public:
 
         x_rate = 0.0;
         y_rate = 0.0;
-        bboxes_buffer.clear();
     }
 
 private:
     Drone* drone;
     std::vector<DronePX4::BoundingBox> bboxes;
     DronePX4::BoundingBox closest_bbox;
-    std::deque<float> bboxes_buffer;
 
     Eigen::Vector2d image_center = Eigen::Vector2d({0.5, 0.5});
     PidController x_pid, y_pid;
@@ -102,24 +97,5 @@ private:
     Eigen::Vector3d pos, goal, little_goal, goal_diff;
     float min_height;
 
-
-    void updateBBoxesBuffer(float new_center_x)
-    {
-        if (bboxes_buffer.size() >= 100){
-            bboxes_buffer.pop_front();
-        }
-        bboxes_buffer.push_back(new_center_x);
-    }
-
-    bool allElementsEqual(const std::deque<float>& buffer)
-    {
-        if (buffer.empty()) return true;
-        float first_value = buffer[0];
-        for (const auto& value : buffer){
-            if (value != first_value) {
-                return false;
-            }
-        }
-        return buffer.size() >= 99; // 5 seconds
-    }
+    std::chrono::steady_clock::time_point start_time_;
 };

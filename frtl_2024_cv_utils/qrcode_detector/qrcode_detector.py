@@ -37,30 +37,39 @@ class QRCodeDetectionNode(Node):
         detections_msg = Detection2DArray()
         annotated_frame = frame.copy()
 
-        for prediction in predictions:
-            x_center = prediction.x / frame.shape[1]
-            y_center = prediction.y / frame.shape[0]
-            width = prediction.width / frame.shape[1]
-            height = prediction.height / frame.shape[0]
+        if predictions:
+            for prediction in predictions:
+                x_center = prediction.x / frame.shape[1]
+                y_center = prediction.y / frame.shape[0]
+                width = prediction.width / frame.shape[1]
+                height = prediction.height / frame.shape[0]
 
-            # Add bounding box to detections
-            detection = Detection2D()
-            detection.bbox = BoundingBox2D()
-            detection.bbox.center.position.x = x_center
-            detection.bbox.center.position.y = y_center
-            detection.bbox.size_x = width
-            detection.bbox.size_y = height
-            detections_msg.detections.append(detection)
+                # Add bounding box to detections
+                detection = Detection2D()
+                detection.bbox = BoundingBox2D()
+                detection.bbox.center.position.x = x_center
+                detection.bbox.center.position.y = y_center
+                detection.bbox.size_x = width
+                detection.bbox.size_y = height
+                detections_msg.detections.append(detection)
 
-            # Draw bounding box on the frame
-            start_point = (int(prediction.x - prediction.width / 2), int(prediction.y - prediction.height / 2))
-            end_point = (int(prediction.x + prediction.width / 2), int(prediction.y + prediction.height / 2))
-            cv2.rectangle(annotated_frame, start_point, end_point, (0, 255, 0), 2)
-            cv2.putText(annotated_frame, prediction.class_name, start_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                # Draw bounding box on the frame
+                start_point = (int(prediction.x - prediction.width / 2), int(prediction.y - prediction.height / 2))
+                end_point = (int(prediction.x + prediction.width / 2), int(prediction.y + prediction.height / 2))
+                cv2.rectangle(annotated_frame, start_point, end_point, (0, 255, 0), 2)
+                cv2.putText(annotated_frame, prediction.class_name, start_point, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        else:
+            # No detections: publish a default bounding box with zeros
+            default_detection = Detection2D()
+            default_detection.bbox = BoundingBox2D()
+            default_detection.bbox.center.position.x = 0.000
+            default_detection.bbox.center.position.y = 0.000
+            default_detection.bbox.size_x = 0.000
+            default_detection.bbox.size_y = 0.000
+            detections_msg.detections.append(default_detection)
 
-        # Publish detections if any
-        if detections_msg.detections:
-            self.qr_location_pub.publish(detections_msg)
+        # Publish detections
+        self.qr_location_pub.publish(detections_msg)
 
         # Publish the annotated image
         compressed_image_msg = CompressedImage()
@@ -82,7 +91,6 @@ class QRCodeDetectionNode(Node):
             qr_string_msg = String()
             qr_string_msg.data = ""
             self.qr_string_pub.publish(qr_string_msg)
-
 
 
 def main(args=None):

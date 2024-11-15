@@ -25,14 +25,19 @@ public:
                     + std::to_string(base.coordinates[0]) + ", " 
                     + std::to_string(base.coordinates[1]) + ", " 
                     + std::to_string(base.coordinates[2]) + "}");
+                finished_bases = false;
                 break;
             }
+            finished_bases = true;
         }
         goal = base_to_visit->coordinates;
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
+
+        if (finished_bases) return "FINISHED BASES";
+        
         pos = drone->getLocalPosition();
 
         if ((pos - goal).norm() < 0.10){
@@ -63,4 +68,5 @@ private:
     Base* base_to_visit;
     Eigen::Vector3d pos, orientation, goal, goal_diff, little_goal;
     const float max_velocity = 0.4;
+    bool finished_bases = false;
 };

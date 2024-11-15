@@ -17,14 +17,14 @@ public:
         this->blackboard_set<Drone>("drone", new Drone());
         Drone* drone = blackboard_get<Drone>("drone");
 
-        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.0, -0.75, -0.50});
+        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.0, -0.85, -0.50});
         drone->setHomePosition(fictual_home);
 
         const Eigen::Vector3d home_pos = drone->getLocalPosition(); 
         const Eigen::Vector3d orientation = drone->getOrientation();
 
         std::vector<Base> bases;
-        float takeoff_height = -1.5;
+        float takeoff_height = -1.7;
 
         const Eigen::Vector3d base_A = Eigen::Vector3d({0.75, -5.98, -0.10 + takeoff_height}); //Qrcode D
         const Eigen::Vector3d base_B = Eigen::Vector3d({3.46, -3.81, -0.10 + takeoff_height}); //qrcode C
@@ -41,7 +41,6 @@ public:
 
         this->blackboard_set<std::vector<Base>>("bases", bases);
         this->blackboard_set<Eigen::Vector3d>("home_position", home_pos);
-        this->blackboard_set<bool>("finished_bases", false);
         this->blackboard_set<float>("initial_yaw", orientation[2]);
         this->blackboard_set<float>("takeoff_height", takeoff_height);
 
@@ -57,10 +56,10 @@ public:
 
         // GO TO BASE transitions
         this->add_transitions("GO TO BASE", {{"AT APPROXIMATE BASE", "CENTRALIZE BASE"},{"SEG FAULT", "ERROR"}});
+        this->add_transitions("GO TO BASE", {{"FINISHED BASES", "RETURN HOME"},{"SEG FAULT", "ERROR"}});
 
         // CENTRALIZE BASE transitions
         this->add_transitions("CENTRALIZE BASE", {{"CENTRALIZED BASE", "READ"},{"SEG FAULT", "ERROR"}});
-        this->add_transitions("CENTRALIZE BASE", {{"LOST BASE", "GO TO BASE"}, {"SEG FAULT", "ERROR"}});
 
         // READ transitions
         this->add_transitions("READ", {{"GOT QR CODE", "GO TO BASE"},{"SEG FAULT", "ERROR"}});

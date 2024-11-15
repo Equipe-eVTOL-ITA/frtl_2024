@@ -29,9 +29,22 @@ ament_target_dependencies(fase3
   vision_msgs
 )
 
+add_executable(fase3_middle
+  src/fase3_middle.cpp
+)
+
+ament_target_dependencies(fase3_middle
+  rclcpp
+  fsm
+  frtl_2024_drone
+  Eigen3
+  vision_msgs
+)
+
 install(
   TARGETS
     fase3
+    fase3_middle
   DESTINATION lib/${PROJECT_NAME}
 )
 
