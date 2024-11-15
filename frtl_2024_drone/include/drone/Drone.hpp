@@ -15,6 +15,9 @@
 #include <vision_msgs/msg/detection2_d_array.hpp>
 #include <custom_msgs/msg/gesture.hpp>
 #include <custom_msgs/msg/hand_location.hpp>
+#include <custom_msgs/msg/bar_code.hpp>
+#include <custom_msgs/msg/multi_bar_code.hpp>
+#include "std_msgs/msg/string.hpp"
 
 #include <px4_msgs/msg/vehicle_status.hpp>
 #include <px4_msgs/msg/vtol_vehicle_status.hpp>
@@ -200,6 +203,10 @@ public:
 	void resetHands();
 
 	std::vector<DronePX4::BoundingBox> getBoundingBox();
+
+	std::vector<Eigen::Vector4d> getBarCodeLocation();
+
+	std::string readQRCode();
 	
 private:
 	/// Send command to PX4
@@ -262,6 +269,9 @@ private:
 
 	rclcpp::Subscription<custom_msgs::msg::HandLocation>::SharedPtr hand_location_sub_;
 
+	rclcpp::Subscription<custom_msgs::msg::MultiBarCode>::SharedPtr bar_code_sub_;
+
+	rclcpp::Subscription<std_msgs::msg::String>::SharedPtr qr_code_sub_;
 
 
 	// Service clients
@@ -312,6 +322,8 @@ private:
     Eigen::Vector3d convertVelocityFRDtoNED(const Eigen::Vector3d& velocity_frd) const;
 
 	std::vector<DronePX4::BoundingBox> detections_{};
+	std::vector<Eigen::Vector4d> barcode_detections_ {};
+
 	float bbox_center_x_{0.0};
 	float bbox_center_y_{0.0};
 	float bbox_size_x_{0.0};
@@ -321,6 +333,8 @@ private:
 
 	float hand_location_x_{0.5};
 	float hand_location_y_{0.5};
+
+	std::string qr_code_data_{""}; 
 
 	std::unordered_map<std::string, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr> image_publishers_;
 	

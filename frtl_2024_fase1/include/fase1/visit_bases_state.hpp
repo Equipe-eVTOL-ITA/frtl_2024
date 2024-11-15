@@ -20,9 +20,9 @@ public:
         drone = blackboard.get<Drone>("drone");
         drone->log("STATE: VISIT BASES");
 
-        orientation = drone->getOrientation();
         float takeoff_height = *blackboard.get<float>("takeoff_height");
         const Eigen::Vector2d approx_base = *blackboard.get<Eigen::Vector2d>("approximate_base");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
 
         approx_goal = Eigen::Vector3d(approx_base.x(), approx_base.y(), takeoff_height);
         
@@ -46,7 +46,7 @@ public:
             }
             little_goal = goal_diff + pos;
 
-            drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation[2]);
+            drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], initial_yaw);
 
             return "";
         }
@@ -107,8 +107,9 @@ private:
     DronePX4::BoundingBox closest_bbox;
     std::deque<float> bboxes_buffer;
     bool at_approximate_base = false;
-    Eigen::Vector3d pos, orientation, approx_goal, little_goal;
-    float max_velocity = 1.0;
+    Eigen::Vector3d pos, approx_goal, little_goal;
+    float max_velocity = 0.9;
+    float initial_yaw;
 
     void updateBBoxesBuffer(float new_center_x)
     {

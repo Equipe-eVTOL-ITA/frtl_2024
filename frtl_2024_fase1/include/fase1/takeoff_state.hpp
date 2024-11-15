@@ -19,9 +19,10 @@ public:
         finished_bases_ = *blackboard.get<bool>("finished_bases");
 
         float takeoff_height = *blackboard.get<float>("takeoff_height");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
+        
         
         pos_ = drone_->getLocalPosition();
-        orientation_ = drone_->getOrientation();
         goal_ = Eigen::Vector3d({pos_[0], pos_[1], takeoff_height});
     }
 
@@ -44,7 +45,7 @@ public:
 
         little_goal = goal_diff + pos_;
 
-        drone_->setLocalPosition(goal_[0], goal_[1], little_goal[2], orientation_[2]);
+        drone_->setLocalPosition(goal_[0], goal_[1], little_goal[2], initial_yaw);
         
         return "";
     }
@@ -52,6 +53,7 @@ public:
 private:
     bool finished_bases_;
     Drone* drone_;
-    Eigen::Vector3d pos_, goal_, orientation_, goal_diff, little_goal;
+    Eigen::Vector3d pos_, goal_, goal_diff, little_goal;
     float max_velocity = 1.0;
+    float initial_yaw;
 };

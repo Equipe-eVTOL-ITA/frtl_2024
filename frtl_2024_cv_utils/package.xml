@@ -18,6 +18,10 @@
   <depend>cv_bridge</depend>
   <depend>ultralytics</depend>
   <depend>vision_msgs</depend>
+  <depend>custom_msgs</depend>
+
+  <exec_depend>pyzbar</exec_depend>
+  <exec_depend>opencv-python</exec_depend>
 
   <!-- Test dependencies -->
   <test_depend>ament_lint_auto</test_depend>

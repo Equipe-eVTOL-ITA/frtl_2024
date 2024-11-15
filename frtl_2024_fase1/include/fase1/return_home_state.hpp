@@ -14,7 +14,7 @@ public:
 
         home_pos_ = *blackboard.get<Eigen::Vector3d>("home_position");
         pos_ = drone_->getLocalPosition();
-        orientation_ = drone_->getOrientation();
+        initial_yaw = *blackboard.get<float>("initial_yaw");
 
         goal_ = Eigen::Vector3d({home_pos_.x(), home_pos_.y(), pos_.z()});
         
@@ -55,7 +55,7 @@ public:
             }
             little_goal_ = goal_diff + pos_;
             
-            drone_->setLocalPosition(little_goal_[0], little_goal_[1], pos_[2], orientation_[2]);
+            drone_->setLocalPosition(little_goal_[0], little_goal_[1], pos_[2], initial_yaw);
         }
         else
         {
@@ -68,7 +68,7 @@ public:
                 goal_diff = goal_diff.normalized() * max_velocity;
             }
             little_goal_ = goal_diff + pos_;
-            drone_->setLocalPosition(little_goal_[0], little_goal_[1], little_goal_[2] - 0.05, orientation_[2]);
+            drone_->setLocalPosition(little_goal_[0], little_goal_[1], little_goal_[2] - 0.05, initial_yaw);
         }
 
         return "";
@@ -76,8 +76,9 @@ public:
 
 private:
     bool over_base_ = false;
-    Eigen::Vector3d home_pos_, pos_, orientation_, home_horizon_, goal_, goal_diff, little_goal_;
+    Eigen::Vector3d home_pos_, pos_, home_horizon_, goal_, goal_diff, little_goal_;
     Drone* drone_;
-    const float max_velocity = 1.0;
+    const float max_velocity = 0.7;
     std::chrono::steady_clock::time_point start_time_; 
+    float initial_yaw;
 };

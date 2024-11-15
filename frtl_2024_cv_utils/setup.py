@@ -15,8 +15,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            # Make sure the name of the executable matches your intended usage and the actual file
             'yolo_classifier = yolo_classifier.yolo_classifier:main',
+            'barcode = barcode_detector.oak_bar:main',
+            'qrcode = qrcode_detector.qrcode_detector:main'
         ],
     }
 )

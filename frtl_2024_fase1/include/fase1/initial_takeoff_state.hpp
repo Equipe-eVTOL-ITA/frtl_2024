@@ -18,8 +18,8 @@ public:
         drone->armSync();
         
         pos = drone->getLocalPosition();
-        orientation = drone->getOrientation();
         float target_height = *blackboard.get<float>("takeoff_height");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
 
         drone->log("Home at: " + std::to_string(pos[0])
                     + " " + std::to_string(pos[1]) + " " + std::to_string(pos[2]));
@@ -47,14 +47,15 @@ public:
             goal_diff = goal_diff.normalized() * max_velocity;
         }
         little_goal = goal_diff + pos;
-        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], orientation[2]);
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], initial_yaw);
         
         return "";
     }
 
 private:
     const float max_velocity = 1.0;
-    Eigen::Vector3d pos, orientation, goal, goal_diff, little_goal;
+    Eigen::Vector3d pos, goal, goal_diff, little_goal;
     Drone* drone;
     int i_ = 0;
+    float initial_yaw;
 };
