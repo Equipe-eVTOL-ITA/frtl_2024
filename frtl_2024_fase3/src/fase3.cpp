@@ -17,7 +17,7 @@ public:
         this->blackboard_set<Drone>("drone", new Drone());
         Drone* drone = blackboard_get<Drone>("drone");
 
-        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.2, -1.10, -0.55});
+        const Eigen::Vector3d fictual_home = Eigen::Vector3d({1.0, -0.75, -0.50});
         drone->setHomePosition(fictual_home);
 
         const Eigen::Vector3d home_pos = drone->getLocalPosition(); 
@@ -26,16 +26,16 @@ public:
         std::vector<Base> bases;
         float takeoff_height = -1.5;
 
-        const Eigen::Vector3d base_A = Eigen::Vector3d({1.0, -4.0, -1.55 + takeoff_height});
-        const Eigen::Vector3d base_B = Eigen::Vector3d({2.0, -7.0, -0.10 + takeoff_height});
-        const Eigen::Vector3d base_C = Eigen::Vector3d({4.0, -5.0, -0.10 + takeoff_height});
-        const Eigen::Vector3d base_D = Eigen::Vector3d({6.0, -3.0, -0.10 + takeoff_height});
-        const Eigen::Vector3d base_E = Eigen::Vector3d({7.0, -1.0, -1.05 + takeoff_height});
+        const Eigen::Vector3d base_A = Eigen::Vector3d({0.75, -5.98, -0.10 + takeoff_height}); //Qrcode D
+        const Eigen::Vector3d base_B = Eigen::Vector3d({3.46, -3.81, -0.10 + takeoff_height}); //qrcode C
+        const Eigen::Vector3d base_C = Eigen::Vector3d({6.63, -3.81, -0.10 + takeoff_height}); //QRCODE A
+        const Eigen::Vector3d base_D = Eigen::Vector3d({1.0, -3.5, -1.00 + takeoff_height}); //qrcode E
+        const Eigen::Vector3d base_E = Eigen::Vector3d({7.0, -1.0, -1.50 + takeoff_height}); //qrcode B
 
+        bases.push_back({base_D, "D", false});
         bases.push_back({base_A, "A", false});
         bases.push_back({base_B, "B", false});
         bases.push_back({base_C, "C", false});
-        bases.push_back({base_D, "D", false});
         bases.push_back({base_E, "E", false});
 
 
