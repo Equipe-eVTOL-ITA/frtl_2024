@@ -14,6 +14,10 @@
 #include <vision_msgs/msg/detection2_d_array.hpp>
 #include <custom_msgs/msg/gesture.hpp>
 #include <custom_msgs/msg/hand_location.hpp>
+#include <custom_msgs/msg/bar_code.hpp>
+#include <custom_msgs/msg/multi_bar_code.hpp>
+#include "std_msgs/msg/string.hpp"
+
 
 Drone::Drone() {
 
@@ -304,6 +308,33 @@ Drone::Drone() {
 			this->hand_location_y_ = msg->hand_y;
 		}
 	);
+
+
+	this->bar_code_sub_ = this->px4_node_->create_subscription<custom_msgs::msg::MultiBarCode>(
+		"/barcode/bounding_boxes",
+		qos_profile,
+		[this](const custom_msgs::msg::MultiBarCode::SharedPtr msg) {
+			barcode_detections_.clear();
+			
+			for (const auto &detection : msg->barcodes) {
+				// Access the bounding box information in each BarCode message
+				float bbox_center_x_ = detection.center_x;
+				float bbox_center_y_ = detection.center_y;
+				float bbox_size_x_ = detection.width;
+				float bbox_size_y_ = detection.height;
+
+				// Store the values in detections_ or process as needed
+				barcode_detections_.push_back(Eigen::Vector4d({bbox_center_x_, bbox_center_y_, bbox_size_x_, bbox_size_y_}));
+			}
+		}
+	);
+
+	this->qr_code_sub_ = this->px4_node_->create_subscription<std_msgs::msg::String>(
+		"/qr_code_string",
+		qos_profile,
+		[this](std_msgs::msg::String::SharedPtr msg) {
+			this->qr_code_data_ = msg->data;
+	});
 
 }
 
@@ -740,6 +771,12 @@ std::vector<DronePX4::BoundingBox> Drone::getBoundingBox(){
 	return detections_;
 }
 
+std::vector<Eigen::Vector4d> Drone::getBarCodeLocation() {
+	return barcode_detections_;
+}
+
+
+
 std::vector<std::string> Drone::getHandGestures() { 
 	return gestures_;
 }
@@ -754,6 +791,9 @@ void Drone::resetHands() {
 	gestures_ = {"", ""};
 }
 
+std::string Drone::readQRCode(){
+	return qr_code_data_;
+}
 
 //Coordinate System transformations (private functions)
 

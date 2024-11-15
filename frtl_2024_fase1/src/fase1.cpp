@@ -34,7 +34,7 @@ public:
 
         // ARENA POINTS
         std::vector<ArenaPoint> waypoints;
-        float takeoff_height = -3.0;
+        float takeoff_height = -2.3;
         waypoints.push_back({Eigen::Vector3d({1.0, -7.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({3.0, -7.0, takeoff_height})});
         waypoints.push_back({Eigen::Vector3d({3.0, -1.0, takeoff_height})});
