@@ -1,36 +1,51 @@
+#include <Eigen/Eigen>
+#include <chrono>
+
 #include "fsm/fsm.hpp"
 #include "drone/Drone.hpp"
-#include <Eigen/Eigen>
-
-#include "fase1_dummy/base.hpp"
 
 class LandingState : public fsm::State {
 public:
     LandingState() : fsm::State() {}
 
     void on_enter(fsm::Blackboard &blackboard) override {
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
-        drone_->log("STATE: LANDING");
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
+        drone->log("STATE: LANDING");
 
-        landing_height_ = *blackboard.get<float>("landing_height");
+        float landing_height = *blackboard.get<float>("landing_height");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
 
-        pos_ = drone_->getLocalPosition();
-        Eigen::Vector3d orientation = drone_->getOrientation();
-        initial_yaw_ = orientation[0];
+        pos = drone->getLocalPosition();
 
-        goal_ = Eigen::Vector3d({pos_[0], pos_[1], landing_height_});
+        goal = Eigen::Vector3d({pos[0], pos[1], landing_height + 0.1});
+
+        start_time = std::chrono::steady_clock::now();
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void) blackboard;
-        pos_ = drone_->getLocalPosition();
 
-        if ((pos_-goal_).norm() < 0.10){
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+
+        if (elapsed_time > 15) {
             return "LANDED";
         }
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], this->initial_yaw_);
+        pos = drone->getLocalPosition();
+
+        if ((pos-goal).norm() < 0.10){
+            return "LANDED";
+        }
+
+        Eigen::Vector3d distance = goal - pos;
+        if (distance.norm() > max_velocity){
+            distance = distance.normalized() * max_velocity;
+        }
+        Eigen::Vector3d little_goal = distance + pos;
+        
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], initial_yaw);
         
         return "";
     }
@@ -38,16 +53,18 @@ public:
     void on_exit(fsm::Blackboard &blackboard) override {
         (void) blackboard;
 
-        //Descend for 3s at 0.4m/s to make sure it is landed
-        for (int i = 0 ;i < 30; i++){
-            drone_->setLocalVelocity(0.0, 0.0, 0.4);
-            usleep(1e5);
-        }
-        drone_->log("Landed at height: " + std::to_string(pos_[2]));
+        // SEND 3 REPETITIVE COMMANDS TO SWITCH TO LAND MODE
+        // drone->log("Entering Land Mode to make sure it is landed.");
+        // for (int i = 0 ;i < 3; i++){
+            // drone->land();
+            // rclcpp::sleep_for(std::chrono::milliseconds(500));
+        // }
     }
 
 private:
-    Drone* drone_;
-    float landing_height_, initial_yaw_;
-    Eigen::Vector3d pos_, goal_;
+    Drone* drone;
+    float initial_yaw;
+    Eigen::Vector3d pos, goal;
+    std::chrono::steady_clock::time_point start_time; 
+    const float max_velocity = 1.0;
 };
