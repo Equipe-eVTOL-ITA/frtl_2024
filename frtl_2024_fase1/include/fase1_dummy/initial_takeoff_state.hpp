@@ -1,8 +1,9 @@
-#include "fsm/fsm.hpp"
-#include "drone/Drone.hpp"
 #include <Eigen/Eigen>
 
-#include <opencv2/highgui.hpp>
+#include "fsm/fsm.hpp"
+#include "drone/Drone.hpp"
+#include "Base.hpp"
+
 
 class InitialTakeoffState : public fsm::State {
 public:
@@ -10,43 +11,47 @@ public:
 
     void on_enter(fsm::Blackboard &blackboard) override {
 
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
+        drone->log("STATE: INITIAL TAKEOFF");
 
-        drone_->log("STATE: INITIAL TAKEOFF");
-
-        drone_->toOffboardSync();
-        drone_->arm();
+        drone->toOffboardSync();
+        drone->armSync();
         
-        Eigen::Vector3d pos = drone_->getLocalPosition(),
-                        orientation = drone_->getOrientation();
+        pos = drone->getLocalPosition();
+        float takeoff_height = *blackboard.get<float>("takeoff_height");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
 
-        blackboard.set<Eigen::Vector3d>("home_position", pos);
-        
-        this->initial_x_ = pos[0];
-        this->initial_y_ = pos[1];
-        this->initial_yaw_ = orientation[0];
-        this->target_height_ = *blackboard.get<float>("takeoff_height") + pos[2];
+        drone->log("Home at: " + std::to_string(pos[0])
+                    + " " + std::to_string(pos[1]) + " " + std::to_string(pos[2]));
 
-        drone_->log("Home at: " + std::to_string(pos[0])
-                    + " " + std::to_string(pos[2]) + " " + std::to_string(pos[2]));
+        goal = Eigen::Vector3d({pos[0], pos[1], takeoff_height});
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void)blackboard;
         
-        Eigen::Vector3d pos  = drone_->getLocalPosition(),
-                        goal = Eigen::Vector3d({this->initial_x_, this->initial_y_, this->target_height_});
+        pos = drone->getLocalPosition();
 
-        if ((pos-goal).norm() < 0.10)
+        if ((pos-goal).norm() < 0.15){
             return "INITIAL TAKEOFF COMPLETED";
+        }
 
-        drone_->setLocalPosition(this->initial_x_, this->initial_y_, this->target_height_, this->initial_yaw_);
+        Eigen::Vector3d distance = goal - pos;
+
+        if (distance.norm() > max_velocity){
+            distance = distance.normalized() * max_velocity;
+        }
+        Eigen::Vector3d little_goal = distance + pos;
+        
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], initial_yaw);
         
         return "";
     }
 
 private:
-    float initial_x_, initial_y_, target_height_, initial_yaw_;
-    Drone* drone_;
+    const float max_velocity = 1.0;
+    Eigen::Vector3d pos, goal;
+    Drone* drone;
+    float initial_yaw;
 };

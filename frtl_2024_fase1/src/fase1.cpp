@@ -6,7 +6,9 @@
 #include "fase1/visit_bases_state.hpp"
 #include "fase1/CoordinateTransforms.hpp"
 #include "fase1/Base.hpp"
+#include "fase1/ArenaPoint.hpp"
 #include <rclcpp/rclcpp.hpp>
+
 
 #include <memory>
 #include <iostream>

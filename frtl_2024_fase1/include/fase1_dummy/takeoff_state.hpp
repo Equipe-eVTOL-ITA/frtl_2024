@@ -1,8 +1,9 @@
-#include "fsm/fsm.hpp"
-#include "drone/Drone.hpp"
 #include <Eigen/Eigen>
 
-#include <opencv2/highgui.hpp>
+#include "fsm/fsm.hpp"
+#include "drone/Drone.hpp"
+#include "Base.hpp"
+
 
 class TakeoffState : public fsm::State {
 public:
@@ -10,45 +11,46 @@ public:
 
     void on_enter(fsm::Blackboard &blackboard) override {
 
-        drone_ = blackboard.get<Drone>("drone");
-        if (drone_ == nullptr) return;
-
-        drone_->log("STATE: TAKEOFF");
-
-        std::vector<Base> bases_obj = *blackboard.get<std::vector<Base>>("bases");
-        drone_->log("Finished bases: " + std::to_string(bases_obj[0].is_visited) + " " + std::to_string(bases_obj[1].is_visited) + " "
-                    + std::to_string(bases_obj[2].is_visited) + " "+ std::to_string(bases_obj[3].is_visited) + " "
-                    + std::to_string(bases_obj[4].is_visited));
-
-        finished_bases_ = *blackboard.get<bool>("finished_bases");
-        drone_->log("Are bases finished? " + std::to_string(finished_bases_));
-
-        float takeoff_height = *blackboard.get<float>("takeoff_height");
+        drone = blackboard.get<Drone>("drone");
+        if (drone == nullptr) return;
+        drone->log("STATE: TAKEOFF");
         
-        pos_ = drone_->getLocalPosition();
-        orientation_ = drone_->getOrientation();
-        goal_ = Eigen::Vector3d({pos_[0], pos_[1], takeoff_height});
+        finished_bases = *blackboard.get<bool>("finished_bases");
+        float takeoff_height = *blackboard.get<float>("takeoff_height");
+        initial_yaw = *blackboard.get<float>("initial_yaw");
+
+        pos = drone->getLocalPosition();
+        goal = Eigen::Vector3d({pos[0], pos[1], takeoff_height});
     }
 
     std::string act(fsm::Blackboard &blackboard) override {
         (void)blackboard;
         
-        pos_  = drone_->getLocalPosition();
+        pos = drone->getLocalPosition();
 
-        if ((pos_-goal_).norm() < 0.10){
-            if (finished_bases_)
+        if ((pos-goal).norm() < 0.10){
+            if (finished_bases)
                 return "FINISHED BASES";
             else
                 return "NEXT BASE";
         }
 
-        drone_->setLocalPosition(goal_[0], goal_[1], goal_[2], orientation_[0]);
+        Eigen::Vector3d distance = goal - pos;
+
+        if (distance.norm() > max_velocity){
+            distance = distance.normalized() * max_velocity;
+        }
+        Eigen::Vector3d little_goal = distance + pos;
+        
+        drone->setLocalPosition(little_goal[0], little_goal[1], little_goal[2], initial_yaw);
         
         return "";
     }
 
 private:
-    bool finished_bases_;
-    Drone* drone_;
-    Eigen::Vector3d pos_, goal_, orientation_;
+    const float max_velocity = 1.0;
+    Eigen::Vector3d pos, goal;
+    Drone* drone;
+    float initial_yaw;
+    bool finished_bases;
 };
