@@ -137,7 +137,7 @@ Drone::Drone() {
 			case px4_msgs::msg::VehicleStatus::ARMING_STATE_ARMED:
 			this->arming_state_ = DronePX4::ARMING_STATE::ARMED;
 			break;
-			case px4_msgs::msg::VehicleStatus::ARMING_STATE_STANDBY:
+			case px4_msgs::msg::VehicleStatus::ARMING_STATE_DISARMED:
 			this->arming_state_ = DronePX4::ARMING_STATE::DISARMED;
 			break;
 			default:
@@ -588,7 +588,7 @@ void Drone::setOffboardControlMode(DronePX4::CONTROLLER_TYPE type) {
 	msg.acceleration = false;
 	msg.attitude = false;
 	msg.body_rate = false;
-	msg.actuator = false;
+	msg.direct_actuator = false;
 
 	if (type == DronePX4::CONTROLLER_TYPE::POSITION) {
 		msg.position = true;
